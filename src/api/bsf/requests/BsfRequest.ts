@@ -1,20 +1,15 @@
 import axios, { AxiosResponse, Method } from 'axios';
+import AuthContext from '../AuthContext';
 
-interface AuthContext {
-  cookies?: string[];
-  accessToken?: string;
-  encodedSessionContext?: string;
-  // add other properties as needed
-}
 
-abstract class BsfRequest<T> {
+export abstract class BsfRequest<T> {
   protected authContext: AuthContext;
 
   constructor(authContext: AuthContext) {
     this.authContext = authContext;
   }
 
-  protected async makeRequest(): Promise<T> {
+  public async makeRequest(): Promise<T> {
     const headers = this.getHeaders();
     this.addAdditionalHeaders(headers);
 

@@ -1,7 +1,7 @@
 // src/components/auth/Login.tsx
 
 import React from 'react';
-import ConfigurationRequest from '../../api/bsf/requests/ConfigurationRequest';
+import { ConfigurationRequest } from '../../api/bsf/requests/ConfigurationRequest';
 import AuthContext from '../../api/bsf/AuthContext';
 
 const Login: React.FC = () => {

@@ -1,26 +1,19 @@
-import axios from 'axios';
-import AuthContext from '../AuthContext';
 import { ConfigurationResponse } from '../response/ConfigurationResponse';
+import AuthContext from '../AuthContext';
+import { BsfRequest } from './BsfRequest';
 
-export default class ConfigurationRequest {
-  private authContext: AuthContext;
-
-  constructor(authContext: AuthContext) {
-    this.authContext = authContext;
+export class ConfigurationRequest extends BsfRequest<ConfigurationResponse> {
+  constructor(protected authContext: AuthContext, /* other dependencies */) {
+    super(authContext);
   }
 
-  async makeRequest(): Promise<void> {
-    try {
-      const response = await axios.get<ConfigurationResponse>('https://www.mybsf.org/assets/config/configuration.json');
-      this.processResponse(response.data);
-    } catch (error) {
-      console.error('Error making request:', error);
-    }
+  protected processResponse(response: any): void {
+    this.authContext.clientId = response.data.b2cConfiguration.b2cPolicies.clientId;
+    this.authContext.scope = response.data.b2cConfiguration.apiConfig.scopes[0];
+    this.authContext.apiEndpoints = response.data.apis;
   }
 
-  private processResponse(response: ConfigurationResponse): void {
-    this.authContext.clientId = response.b2cConfiguration.b2cPolicies.clientId;
-    this.authContext.scope = response.b2cConfiguration.apiConfig.scopes[0] ?? '';
-    this.authContext.apiEndpoints = response.apis;
+  protected generateUrl(): string {
+    return "https://www.mybsf.org/assets/config/configuration.json";
   }
 }
