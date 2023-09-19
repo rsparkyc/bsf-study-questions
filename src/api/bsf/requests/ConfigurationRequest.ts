@@ -20,7 +20,7 @@ export default class ConfigurationRequest {
 
   private processResponse(response: ConfigurationResponse): void {
     this.authContext.clientId = response.b2cConfiguration.b2cPolicies.clientId;
-    this.authContext.scope = response.apiConfig.scopes[0] ?? '';
+    this.authContext.scope = response.b2cConfiguration.apiConfig.scopes[0] ?? '';
     this.authContext.apiEndpoints = response.apis;
   }
 }
