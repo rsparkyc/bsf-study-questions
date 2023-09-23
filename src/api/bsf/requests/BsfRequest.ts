@@ -13,11 +13,17 @@ export abstract class BsfRequest<T> {
     const headers = this.getHeaders();
     this.addAdditionalHeaders(headers);
 
-    const requestOptions = {
+    const proxiedRequestOptions = {
       url: this.generateUrl(),
       method: this.getRequestMethod(),
       headers,
       data: this.getRequestBody()
+    };
+
+    const requestOptions = {
+      url: 'https://fff4in4hx53xkqbay4dxybzfze0lvjnm.lambda-url.us-east-1.on.aws/',
+      method: 'POST',
+      data: proxiedRequestOptions
     };
 
     const response: AxiosResponse<T> = await axios(requestOptions);
