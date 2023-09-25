@@ -4,18 +4,20 @@ import React from 'react';
 import { ConfigurationRequest } from '../../api/bsf/requests/ConfigurationRequest';
 import AuthContext from '../../api/bsf/AuthContext';
 import { AuthorizeRequest } from '../../api/bsf/requests/AuthorizeRequest';
+import { SelfAssertedRequest } from '../../api/bsf/requests/SelfAssertedRequest';
 
 const Login: React.FC = () => {
-  const authContext = new AuthContext(null, "");
+  const authContext = new AuthContext({email: 'casker@gmail.com', password: '3zV5RzJus%no'}, "");
 
   const handleLoginClick = async () => {
     const configRequest = new ConfigurationRequest(authContext);
     await configRequest.makeRequest();
-    console.log(authContext); // Log the populated authContext for debug purposes
 
     const authorizeRequest = new AuthorizeRequest(authContext);
     await authorizeRequest.makeRequest();
-    console.log(authContext); // Log the populated authContext for debug purposes
+
+    const selfAssertedRequest = new SelfAssertedRequest(authContext);
+    await selfAssertedRequest.makeRequest();
   };
 
   return (

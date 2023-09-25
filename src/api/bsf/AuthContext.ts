@@ -6,7 +6,8 @@ const Buffer = buffer.Buffer;
 
 
 interface Credentials {
-  // your credential structure
+  email: string,
+  password: string
 }
 
 interface AccessToken {
@@ -19,7 +20,7 @@ interface Person {
 
 export default class AuthContext {
   positionCodeUsed: string;
-  credentials: Credentials | null;
+  credentials: Credentials;
   accessToken?: AccessToken;
   nonce: string;
   clientRequestId: string;
@@ -35,7 +36,7 @@ export default class AuthContext {
   apiEndpoints?: { [key: string]: string };
   encodedSessionContext?: string;
 
-  constructor(credentials: Credentials | null, positionCodeUsed: string) {
+  constructor(credentials: Credentials, positionCodeUsed: string) {
     this.clientRequestId = uuidV4();
     const plainTextState = JSON.stringify({
       id: uuidV4(),

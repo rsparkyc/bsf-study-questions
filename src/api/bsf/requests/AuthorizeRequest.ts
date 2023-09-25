@@ -24,7 +24,7 @@ export class AuthorizeRequest extends BsfRequest<string> {
   }
 
   protected generateUrl(): string {
-    let url = `https://login.mybsf.org/bsfmcaiamprod.onmicrosoft.com/b2c_1a_signuporsignin/oauth2/v2.0/authorize?` +
+    const url = `https://login.mybsf.org/bsfmcaiamprod.onmicrosoft.com/b2c_1a_signuporsignin/oauth2/v2.0/authorize?` +
       `client_id=${this.authContext.clientId}` +
       `&scope=${this.authContext.scope}` +
       `&redirect_uri=https://www.mybsf.org/` +

@@ -4,6 +4,7 @@ import AuthContext from '../AuthContext';
 
 export abstract class BsfRequest<T> {
   protected authContext: AuthContext;
+  protected extractedCookies: Record<string, string> = {};
 
   constructor(authContext: AuthContext) {
     this.authContext = authContext;
@@ -27,8 +28,29 @@ export abstract class BsfRequest<T> {
     };
 
     const response: AxiosResponse<T> = await axios(requestOptions);
+    this.extractedCookies = this.extractCookies(response);
+
     this.processResponse(response);
     return response.data;
+  }
+
+  protected extractCookies(response: AxiosResponse<T>): Record<string, string> {
+    debugger;
+    let extracted: Record<string, string> = {};
+
+    if (response.headers['x-c-data']) {
+      let cookieData: string[] = response.headers['x-c-data'].split(',');
+      cookieData.forEach(cookie => {
+        const trimmed = cookie.trim();
+        const index = trimmed.indexOf('=');
+        const key = trimmed.substring(0, index);
+        const val = trimmed.substring(index + 1);
+        extracted[key] = val;
+      });
+    }
+
+    return extracted;
+
   }
 
   private getHeaders(): Record<string, string> {
