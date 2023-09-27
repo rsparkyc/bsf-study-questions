@@ -35,17 +35,23 @@ export abstract class BsfRequest<T> {
   }
 
   protected extractCookies(response: AxiosResponse<T>): Record<string, string> {
-    debugger;
     let extracted: Record<string, string> = {};
 
     if (response.headers['x-c-data']) {
-      let cookieData: string[] = response.headers['x-c-data'].split(',');
+      let cookieData: string[] = (response.headers['x-c-data'] + ',').split('HttpOnly,');
       cookieData.forEach(cookie => {
-        const trimmed = cookie.trim();
-        const index = trimmed.indexOf('=');
-        const key = trimmed.substring(0, index);
-        const val = trimmed.substring(index + 1);
-        extracted[key] = val;
+        let trimmed = cookie.trimStart();
+        if (trimmed.startsWith('[')) {
+          trimmed = trimmed.substring(1);
+        }
+        if (trimmed.length > 0) {
+          const index = trimmed.indexOf('=');
+          const key = trimmed.substring(0, index);
+          const val = trimmed.substring(index + 1).split(';')[0];
+          if (val.length !== 0) { // assume expired, don't add
+            extracted[key] = val;
+          }
+        }
       });
     }
 
@@ -57,7 +63,7 @@ export abstract class BsfRequest<T> {
     const headers: Record<string, string> = {};
 
     if (this.authContext.cookies) {
-      headers['Cookie'] = this.authContext.cookies.join('; ');
+      headers['x-c-data'] = JSON.stringify(this.authContext.cookies);
     }
 
     if (this.authContext.accessToken) {

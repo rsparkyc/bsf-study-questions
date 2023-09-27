@@ -9,17 +9,25 @@ export class AuthorizeRequest extends BsfRequest<string> {
 
   protected processResponse(response: AxiosResponse): void {
     console.log("response: " + JSON.stringify(response));
-    const cookieString:string = response.headers['x-c-data'] || [];
+    const cookieStringWithBracktes:string = response.headers['x-c-data'] || '';
+    const cookieString:string = cookieStringWithBracktes.substring(1, cookieStringWithBracktes.length - 1);
+    
     let xCsrfToken = "";
+
+    if (this.authContext.cookies === undefined){
+      this.authContext.cookies = [];
+    }
 
     const cookies = cookieString.split(',');
     cookies.forEach(cookie => {
-      if (cookie.startsWith("X_MS_CPIM_CSRF=") || cookie.startsWith("x-ms-cpim-csrf=")) {
-        xCsrfToken = cookie.replace("X_MS_CPIM_CSRF=", "").replace("x-ms-cpim-csrf=", "").split(";")[0];
+      const trimmed = cookie.trim();
+      this.authContext.cookies?.push(trimmed.split(';')[0]);
+
+      if (trimmed.startsWith("x-ms-cpim-csrf=")) {
+        xCsrfToken = trimmed.replace("x-ms-cpim-csrf=", "").split(";")[0];
       }
     });
 
-    this.authContext.cookies = cookies;
     this.authContext.csrf = xCsrfToken;
   }
 

@@ -5,6 +5,7 @@ import { ConfigurationRequest } from '../../api/bsf/requests/ConfigurationReques
 import AuthContext from '../../api/bsf/AuthContext';
 import { AuthorizeRequest } from '../../api/bsf/requests/AuthorizeRequest';
 import { SelfAssertedRequest } from '../../api/bsf/requests/SelfAssertedRequest';
+import { ConfirmedRequest } from '../../api/bsf/requests/ConfirmedRequest';
 
 const Login: React.FC = () => {
   const authContext = new AuthContext({email: 'casker@gmail.com', password: '3zV5RzJus%no'}, "");
@@ -18,6 +19,9 @@ const Login: React.FC = () => {
 
     const selfAssertedRequest = new SelfAssertedRequest(authContext);
     await selfAssertedRequest.makeRequest();
+
+    const confirmedRequest = new ConfirmedRequest(authContext);
+    await confirmedRequest.makeRequest();
   };
 
   return (

@@ -22,25 +22,33 @@ export class SelfAssertedRequest extends BsfRequest<string> {
     }
 
     protected processResponse(response: AxiosResponse): void {
-        const cookiesToUse: Record<string, string> = {};
+        const newCookies: Record<string, string> = {};
 
-        debugger;
-        // lets use any cookies we got in this request
+        // let's use any cookies we got in this request
         let currentRequestCookies = this.extractCookies(response);
 
         if (currentRequestCookies) {
             Object.keys(currentRequestCookies).forEach((key) => {
-                cookiesToUse[key] = currentRequestCookies[key];
+                newCookies[key] = currentRequestCookies[key];
             });
         }
 
         if (this.authContext.cookies) {
-            Object.keys(this.authContext.cookies).forEach((key) => {
-                if (key.startsWith('x-ms-cpim')) {
-                    cookiesToUse[key] = currentRequestCookies[key];
+            this.authContext.cookies.forEach((cookie) => {
+                if (cookie.startsWith('x-ms-cpim-csrf')) {
+                    const index = cookie.indexOf('=');
+                    const key = cookie.substring(0, index);
+                    const val = cookie.substring(index + 1).split(';')[0];
+                    newCookies[key] = val;
                 }
             });
         }
+
+        let finalCookies: string[] = [];
+        Object.keys(newCookies).forEach((key) => {
+            finalCookies.push(key + "=" + newCookies[key]);
+        });
+        this.authContext.cookies = finalCookies;
 
     }
 
