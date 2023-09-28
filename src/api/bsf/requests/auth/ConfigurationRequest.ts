@@ -1,6 +1,6 @@
-import { ConfigurationResponse } from '../response/ConfigurationResponse';
-import AuthContext from '../AuthContext';
-import { BsfRequest } from './BsfRequest';
+import { ConfigurationResponse } from '../../response/ConfigurationResponse';
+import AuthContext from '../../AuthContext';
+import { BsfRequest } from '../BsfRequest';
 
 export class ConfigurationRequest extends BsfRequest<ConfigurationResponse> {
   constructor(protected authContext: AuthContext, /* other dependencies */) {

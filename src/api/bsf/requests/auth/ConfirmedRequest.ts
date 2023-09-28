@@ -1,6 +1,6 @@
-import { AxiosResponse, Method } from 'axios';
-import AuthContext from '../AuthContext';
-import { BsfRequest } from './BsfRequest';
+import { AxiosResponse } from 'axios';
+import AuthContext from '../../AuthContext';
+import { BsfRequest } from './../BsfRequest';
 
 export class ConfirmedRequest extends BsfRequest<string> {
     constructor(protected authContext: AuthContext, /* other dependencies */) {
@@ -8,7 +8,13 @@ export class ConfirmedRequest extends BsfRequest<string> {
     }
 
     protected processResponse(response: AxiosResponse): void {
-        debugger;
+        const location: string = response.headers.location;
+        const locationParts = location.split('&');
+        for (const part of locationParts){
+            if (part.startsWith('code=')){
+                this.authContext.code = part.replace('code=', '');
+            }
+        }
 
     }
 

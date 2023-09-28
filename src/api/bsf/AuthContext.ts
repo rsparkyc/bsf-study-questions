@@ -50,9 +50,12 @@ export default class AuthContext {
     this.positionCodeUsed = positionCodeUsed;
   }
 
+  public rebuildCodeChallenge() {
+    this.codeChallenge = this.buildCodeChallenge(this.codeVerify);
+  }
+
   private buildCodeChallenge(codeVerify: string): string {
-    const hash = this.hashData(codeVerify);
-    return Buffer.from(hash).toString('base64').replace('+', '-').replace('/', '_').replace('=', '');
+    return this.hashData(codeVerify).replace('+', '-').replace('/', '_').replace('=', '');
   }
 
   private hashData(input: string): string {
@@ -60,9 +63,9 @@ export default class AuthContext {
     const hash = CryptoJS.SHA256(input);
 
     // Convert the hash to a hex string
-    const hexHash = hash.toString(CryptoJS.enc.Hex);
+    const hashString = hash.toString(CryptoJS.enc.Base64);
 
-    return hexHash;
+    return hashString;
   }
 
   private randomString(lowerBound: number, higherBound: number): string {

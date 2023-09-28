@@ -1,6 +1,6 @@
 import { AxiosResponse } from 'axios';
-import AuthContext from '../AuthContext';
-import { BsfRequest } from './BsfRequest';
+import AuthContext from '../../AuthContext';
+import { BsfRequest } from '../BsfRequest';
 
 export class AuthorizeRequest extends BsfRequest<string> {
   constructor(protected authContext: AuthContext, /* other dependencies */) {
@@ -9,12 +9,12 @@ export class AuthorizeRequest extends BsfRequest<string> {
 
   protected processResponse(response: AxiosResponse): void {
     console.log("response: " + JSON.stringify(response));
-    const cookieStringWithBracktes:string = response.headers['x-c-data'] || '';
-    const cookieString:string = cookieStringWithBracktes.substring(1, cookieStringWithBracktes.length - 1);
-    
+    const cookieStringWithBracktes: string = response.headers['x-c-data'] || '';
+    const cookieString: string = cookieStringWithBracktes.substring(1, cookieStringWithBracktes.length - 1);
+
     let xCsrfToken = "";
 
-    if (this.authContext.cookies === undefined){
+    if (this.authContext.cookies === undefined) {
       this.authContext.cookies = [];
     }
 
