@@ -17,7 +17,7 @@ const Person: React.FC<TokenProps> = ({ accessToken }) => {
 
     debugger;
 
-  };
+  }
 
   return (
     <div className="person-container">

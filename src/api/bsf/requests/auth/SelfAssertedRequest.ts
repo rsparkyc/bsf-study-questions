@@ -1,8 +1,8 @@
 import { AxiosResponse, Method } from 'axios';
 import AuthContext from '../../AuthContext';
-import { BsfRequest } from './../BsfRequest';
+import { BsfProxiedRequest } from './BsfProxiedRequest';
 
-export class SelfAssertedRequest extends BsfRequest<string> {
+export class SelfAssertedRequest extends BsfProxiedRequest<string> {
     constructor(protected authContext: AuthContext, /* other dependencies */) {
         super(authContext);
     }

@@ -2,30 +2,46 @@ import axios, { AxiosResponse, Method } from 'axios';
 import AuthContext from '../AuthContext';
 
 
+type MyAxiosRequestConfig = {
+  url: string;
+  method: Method | string; // Import Method from axios if you haven't
+  headers?: Record<string, string>;
+  data: string | null | MyAxiosRequestConfig;
+};
+
 export abstract class BsfRequest<T> {
   protected authContext: AuthContext;
   protected extractedCookies: Record<string, string> = {};
+
+  protected useProxy: boolean = false;
 
   constructor(authContext: AuthContext) {
     this.authContext = authContext;
   }
 
-  public async makeRequest(): Promise<T> {
+  private getRequestOptions():MyAxiosRequestConfig {
     const headers = this.getHeaders();
     this.addAdditionalHeaders(headers);
 
-    const proxiedRequestOptions = {
+    const requestOptions = {
       url: this.generateUrl(),
       method: this.getRequestMethod(),
       headers,
       data: this.getRequestBody()
     };
+    
+    if (this.useProxy) {
+      return {
+        url: 'https://fff4in4hx53xkqbay4dxybzfze0lvjnm.lambda-url.us-east-1.on.aws/',
+        method: 'POST',
+        data: requestOptions
+      };
+    }
+    return requestOptions;
+  }
 
-    const requestOptions = {
-      url: 'https://fff4in4hx53xkqbay4dxybzfze0lvjnm.lambda-url.us-east-1.on.aws/',
-      method: 'POST',
-      data: proxiedRequestOptions
-    };
+  public async makeRequest(): Promise<T> {
+    const requestOptions = this.getRequestOptions();
 
     const response: AxiosResponse<T> = await axios(requestOptions);
     this.extractedCookies = this.extractCookies(response);

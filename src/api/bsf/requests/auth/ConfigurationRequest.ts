@@ -1,9 +1,9 @@
 import { ConfigurationResponse } from '../../response/ConfigurationResponse';
 import AuthContext from '../../AuthContext';
-import { BsfRequest } from '../BsfRequest';
+import { BsfProxiedRequest } from './BsfProxiedRequest';
 
-export class ConfigurationRequest extends BsfRequest<ConfigurationResponse> {
-  constructor(protected authContext: AuthContext, /* other dependencies */) {
+export class ConfigurationRequest extends BsfProxiedRequest<ConfigurationResponse> {
+  constructor(protected authContext: AuthContext) {
     super(authContext);
   }
 
