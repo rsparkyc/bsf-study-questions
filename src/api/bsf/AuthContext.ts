@@ -88,3 +88,20 @@ function randomString(lowerBound: number, higherBound: number): string {
   }
   return randomStringBuilder;
 }
+
+export class AuthContextHolder {
+  static authContext: AuthContext | null = null;
+
+  static buildAuthContext(email: string, password: string) {
+    this.authContext = new AuthContext({ email: email, password: password}, "");
+    return this.getAuthContext();
+
+  }
+
+  static getAuthContext() {
+    if (this.authContext === null){
+      throw new Error("Authcontext not built");
+    }
+    return this.authContext;
+  }
+}

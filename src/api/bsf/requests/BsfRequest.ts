@@ -83,7 +83,7 @@ export abstract class BsfRequest<T> {
     }
 
     if (this.authContext.accessToken) {
-      headers['Authorization'] = `Bearer ${this.authContext.accessToken}`;
+      headers['Authorization'] = `Bearer ${this.authContext.accessToken.access_token}`;
     }
 
     if (this.authContext.encodedSessionContext) {

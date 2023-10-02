@@ -1,6 +1,6 @@
 import React from 'react';
 import { ConfigurationRequest } from '../../api/bsf/requests/auth/ConfigurationRequest';
-import AuthContext, { AccessToken } from '../../api/bsf/AuthContext';
+import AuthContext, { AccessToken, AuthContextHolder } from '../../api/bsf/AuthContext';
 import { AuthorizeRequest } from '../../api/bsf/requests/auth/AuthorizeRequest';
 import { SelfAssertedRequest } from '../../api/bsf/requests/auth/SelfAssertedRequest';
 import { ConfirmedRequest } from '../../api/bsf/requests/auth/ConfirmedRequest';
@@ -11,7 +11,7 @@ type LoginProps = {
 };
 
 const Login: React.FC<LoginProps> = ({setAccessToken}) => {
-  const authContext = new AuthContext({ email: 'casker@gmail.com', password: '3zV5RzJus%no' }, "");
+  const authContext = AuthContextHolder.buildAuthContext('casker@gmail.com', '3zV5RzJus%no');
 
   const handleLoginClick = async () => {
     const configRequest = new ConfigurationRequest(authContext);

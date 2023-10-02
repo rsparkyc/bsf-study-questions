@@ -11,10 +11,6 @@ export class PersonRequest extends BsfProxiedRequest<PersonResponse> {
     debugger;
   }
 
-  protected addAdditionalHeaders(headers: Record<string, string>): void {
-    headers.Authorization = 'Bearer ' + this.authContext.accessToken?.access_token;
-  }
-
   protected generateUrl(): string {
     return "https://bsf-mca-mybsf-api-prod.apibsfinternational.org/api/person";
   }
