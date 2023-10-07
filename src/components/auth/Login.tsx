@@ -1,11 +1,12 @@
-import React from 'react';
-import { ConfigurationRequest } from '../../api/bsf/requests/auth/ConfigurationRequest';
-import AuthContext, { AccessToken, AuthContextHolder } from '../../api/bsf/AuthContext';
+import { AccessToken, AuthContextHolder } from '../../api/bsf/AuthContext';
+
 import { AuthorizeRequest } from '../../api/bsf/requests/auth/AuthorizeRequest';
-import { SelfAssertedRequest } from '../../api/bsf/requests/auth/SelfAssertedRequest';
+import { ConfigurationRequest } from '../../api/bsf/requests/auth/ConfigurationRequest';
 import { ConfirmedRequest } from '../../api/bsf/requests/auth/ConfirmedRequest';
-import { TokenRequest } from '../../api/bsf/requests/auth/TokenRequest';
+import React from 'react';
 import { RefreshTokenRequest } from '../../api/bsf/requests/auth/RefreshTokenRequest';
+import { SelfAssertedRequest } from '../../api/bsf/requests/auth/SelfAssertedRequest';
+import { TokenRequest } from '../../api/bsf/requests/auth/TokenRequest';
 
 type LoginProps = {
   setAccessToken: (token: AccessToken | null) => void;
@@ -13,7 +14,9 @@ type LoginProps = {
 };
 
 const Login: React.FC<LoginProps> = ({setAccessToken, existingAccessToken}) => {
-  const authContext = AuthContextHolder.buildOrGetAuthContext('casker@gmail.com', '3zV5RzJus%no');
+  let username = 'casker@gmail.com';
+  let password = '3zV5RzJus%no';
+  let authContext = AuthContextHolder.buildOrGetAuthContext(username, password);
   if (existingAccessToken){
     authContext.accessToken = existingAccessToken;
   }
@@ -27,17 +30,33 @@ const Login: React.FC<LoginProps> = ({setAccessToken, existingAccessToken}) => {
       await refreshTokenRequest.makeRequest();
     }
     else {
-      const authorizeRequest = new AuthorizeRequest(authContext);
-      await authorizeRequest.makeRequest();
+      let loggedIn = false; 
+      while (!loggedIn) {
+        const authorizeRequest = new AuthorizeRequest(authContext);
+        await authorizeRequest.makeRequest();
 
-      const selfAssertedRequest = new SelfAssertedRequest(authContext);
-      await selfAssertedRequest.makeRequest();
+        const selfAssertedRequest = new SelfAssertedRequest(authContext);
+        await selfAssertedRequest.makeRequest();
 
-      const confirmedRequest = new ConfirmedRequest(authContext);
-      await confirmedRequest.makeRequest();
+        const confirmedRequest = new ConfirmedRequest(authContext);
+        await confirmedRequest.makeRequest();
 
-      const tokenRequest = new TokenRequest(authContext);
-      await tokenRequest.makeRequest();
+        try {
+          const tokenRequest = new TokenRequest(authContext);
+          await tokenRequest.makeRequest();
+          loggedIn = true;
+        }
+        catch (e) {
+          const codeData = {
+            codeChallenge: authContext.codeChallenge,
+            codeVerifify: authContext.codeVerify,
+          };
+          console.warn("error with token request, retrying: " + JSON.stringify(codeData, null, 2));
+          authContext.rebuildCodeChallenge();
+          // pretty sure this is fixed now
+          debugger;
+        }
+      }
     }
 
     localStorage.setItem('accessToken', JSON.stringify(authContext.accessToken));

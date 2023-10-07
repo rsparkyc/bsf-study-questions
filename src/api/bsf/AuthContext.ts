@@ -1,7 +1,9 @@
+import * as buffer from 'buffer';
+
 //import crypto from 'crypto-browserify';
 import CryptoJS from 'crypto-js';
 import randomBytes from 'randombytes';
-import * as buffer from 'buffer';
+
 const Buffer = buffer.Buffer;
 
 interface Credentials {
@@ -54,7 +56,13 @@ export default class AuthContext {
     this.positionCodeUsed = positionCodeUsed;
   }
 
-  public rebuildCodeChallenge() {
+  public rebuildCodeChallenge(codeVerify?: string) {
+    if (codeVerify !== undefined) {
+      this.codeVerify = codeVerify;
+    }
+    else {
+      this.codeVerify = randomString(43, 128);
+    }
     this.codeChallenge = buildCodeChallenge(this.codeVerify);
   }
 
@@ -69,7 +77,7 @@ function uuidV4(): string {
 }
 
 function buildCodeChallenge(codeVerify: string): string {
-  return hashData(codeVerify).replace('+', '-').replace('/', '_').replace('=', '');
+  return hashData(codeVerify).replaceAll('+', '-').replaceAll('/', '_').replaceAll('=', '');
 }
 
 function hashData(input: string): string {
@@ -92,8 +100,8 @@ function randomString(lowerBound: number, higherBound: number): string {
 export class AuthContextHolder {
   static authContext: AuthContext | null = null;
 
-  static buildOrGetAuthContext(email: string, password: string):AuthContext {
-    if (!this.authContext || this.authContext.credentials.email !== email || this.authContext.credentials.password !== password) {
+  static buildOrGetAuthContext(email: string, password: string, forceRebuild?:boolean):AuthContext {
+    if (forceRebuild || !this.authContext || this.authContext.credentials.email !== email || this.authContext.credentials.password !== password) {
       this.authContext = new AuthContext({ email: email, password: password}, "");
     }
     return this.getAuthContext();

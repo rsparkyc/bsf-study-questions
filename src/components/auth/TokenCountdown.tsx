@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+
 import { AccessToken } from '../../api/bsf/AuthContext';
 
 interface TokenCountdownProps {
@@ -10,6 +11,11 @@ const TokenCountdown: React.FC<TokenCountdownProps> = ({ accessToken }) => {
 
   useEffect(() => {
     // Calculate initial time difference
+    if (!accessToken) {
+      setRemainingTime(-1);
+      return;
+    }
+    
     const now = Math.floor(Date.now() / 1000); // Current time in seconds
     setRemainingTime(accessToken.expires_on - now);
 
@@ -22,7 +28,8 @@ const TokenCountdown: React.FC<TokenCountdownProps> = ({ accessToken }) => {
       if (newRemainingTime <= 0) {
         clearInterval(timerId);
       }
-    }, 1000);
+    }
+    , 1000);
 
     // Clean up
     return () => {
