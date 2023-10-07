@@ -3,7 +3,7 @@ import AuthContext from '../../AuthContext';
 import { BsfProxiedRequest } from './BsfProxiedRequest';
 
 export class ConfirmedRequest extends BsfProxiedRequest<string> {
-    constructor(protected authContext: AuthContext, /* other dependencies */) {
+    constructor(protected authContext: AuthContext) {
         super(authContext);
     }
 

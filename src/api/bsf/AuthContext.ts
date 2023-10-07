@@ -92,13 +92,18 @@ function randomString(lowerBound: number, higherBound: number): string {
 export class AuthContextHolder {
   static authContext: AuthContext | null = null;
 
-  static buildAuthContext(email: string, password: string) {
-    this.authContext = new AuthContext({ email: email, password: password}, "");
+  static buildOrGetAuthContext(email: string, password: string):AuthContext {
+    if (!this.authContext || this.authContext.credentials.email !== email || this.authContext.credentials.password !== password) {
+      this.authContext = new AuthContext({ email: email, password: password}, "");
+    }
     return this.getAuthContext();
-
   }
 
-  static getAuthContext() {
+  static hasAuthContext():boolean {
+    return this.authContext !== null;
+  }
+
+  static getAuthContext():AuthContext {
     if (this.authContext === null){
       throw new Error("Authcontext not built");
     }

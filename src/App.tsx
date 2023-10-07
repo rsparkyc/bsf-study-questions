@@ -33,7 +33,7 @@ function App() {
 
   return (
     <div className="App">
-      <Login setAccessToken={setAccessToken} />
+      <Login setAccessToken={setAccessToken} existingAccessToken={accessToken} />
       <textarea disabled id='tokenTextArea' value={JSON.stringify(accessToken, null, 2)}></textarea>
       <TokenCountdown accessToken={accessToken} />
       <Person accessToken={accessToken} />
