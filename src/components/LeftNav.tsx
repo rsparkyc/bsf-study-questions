@@ -34,7 +34,7 @@ const LeftNav: React.FC<LeftNavProps> = ({ data, setCurrentStudyId, setCurrentLe
 
     return (
         <div className="left-nav">
-            {data.data.studies.map((study: Study) => (
+            {[...data.data.studies].reverse().map((study: Study) => (
                 <div key={study.studyId}>
                     <a href="#" onClick={(e) => { e.preventDefault(); toggleStudy(study.studyId); }}>{study.displayName}</a>
                     {expandedStudyId === study.studyId && study.lessons.map((lesson: Lesson) => (
