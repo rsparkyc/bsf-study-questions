@@ -4,6 +4,7 @@ import React, {useEffect, useState} from 'react';
 import { AllLessonsRequest } from '../api/bsf/requests/AllLessonsRequest';
 import AllLessonsResponse from '../api/bsf/response/AllLessonsResponse';
 import Breadcrumbs from './Breadcrumbs';
+import LeftNav from './LeftNav';
 
 interface TokenProps {
   accessToken: AccessToken;
@@ -47,6 +48,13 @@ const TestEndpoint: React.FC<TokenProps> = ({ accessToken }) => {
         lessonId={currentLessonId} 
         lessonDayId={currentLessonDayId}
         data={lessonData} />
+        <LeftNav 
+          data={lessonData} 
+          setCurrentStudyId={setCurrentStudyId} 
+          setCurrentLessonId={setCurrentLessonId}
+          setCurrentLessonDayId={setCurrentLessonDayId}
+      />
+
     </div>
   );
 };
