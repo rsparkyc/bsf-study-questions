@@ -7,10 +7,6 @@ export class AllLessonsRequest extends BsfProxiedRequest<AllLessonsResponse> {
     super(authContext);
   }
 
-  protected processResponse(response: any): void {
-    debugger;
-  }
-
   protected generateUrl(): string {
     return "https://bsf-mca-lessonday-api-prod.apibsfinternational.org/api/lessons/all?locale=en";
   }

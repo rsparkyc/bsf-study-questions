@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import logo from './logo.svg';
-import Login from './components/auth/Login';
 import './App.css';
+
+import { useEffect, useState } from 'react';
+
 import { AccessToken } from './api/bsf/AuthContext';
+import Login from './components/auth/Login';
+import Person from './components/TestEndpointComponent';
 import TokenCountdown from './components/auth/TokenCountdown';
-import Person from './components/PersonComponent';
 
 const isTokenValid = (token: AccessToken): boolean => {
   return true;
