@@ -1,34 +1,54 @@
-import AuthContext, { AccessToken, AuthContextHolder } from '../api/bsf/AuthContext';
+import { AccessToken, AuthContextHolder } from '../api/bsf/AuthContext';
+import React, {useEffect, useState} from 'react';
 
 import { AllLessonsRequest } from '../api/bsf/requests/AllLessonsRequest';
-import { PersonRequest } from '../api/bsf/requests/PersonRequest'
-import React from 'react';
+import AllLessonsResponse from '../api/bsf/response/AllLessonsResponse';
+import Breadcrumbs from './Breadcrumbs';
 
 interface TokenProps {
   accessToken: AccessToken;
 }
 
-const Person: React.FC<TokenProps> = ({ accessToken }) => {
+const TestEndpoint: React.FC<TokenProps> = ({ accessToken }) => {
 
-  const handleTestEndpointClick = async () => {
-    const authContext = AuthContextHolder.getAuthContext();
-    authContext.accessToken = accessToken;
+  const [lessonData, setLessonData] = useState<AllLessonsResponse | undefined>();
+  const [currentStudyId, setCurrentStudyId] = useState<number | undefined>();
+  const [currentLessonId, setCurrentLessonId] = useState<number | undefined>();
+  const [currentLessonDayId, setCurrentLessonDayId] = useState<number | undefined>();
 
-    const allLessonsRequest = new AllLessonsRequest(authContext);
-    const response = await allLessonsRequest.makeRequest();
+  
+  useEffect(() => {
+      // Fetch your API data here and set it to the state
+      async function fetchData() {
+        const authContext = AuthContextHolder.getAuthContext();
+        const allLessonsRequest = new AllLessonsRequest(authContext);
+        const response = await allLessonsRequest.makeRequest();
+        setLessonData(response);
 
-    console.log(JSON.stringify(response, null, 2));
+        // Set the current study, lesson, and lesson day IDs
+        const currentStudy = response.data.studies[6];
+        setCurrentStudyId(currentStudy.studyId);
+        const currentLesson = currentStudy.lessons[3];
+        setCurrentLessonId(currentLesson.lessonId);
+        const currentLessonDay = currentLesson.lessonDays[0];
+        if (currentLessonDay) {
+          setCurrentLessonDayId(currentLessonDay.lessonDayId);
+        }
+        
+      }
 
-    debugger;
-
-  }
+      fetchData();
+  }, []);
 
   return (
     <div className="test-endpoint-container">
-      <h1>Make Request</h1>
-      <button onClick={handleTestEndpointClick}>Make it so.</button>
+      <Breadcrumbs 
+        studyId={currentStudyId} 
+        lessonId={currentLessonId} 
+        lessonDayId={currentLessonDayId}
+        data={lessonData} />
     </div>
   );
 };
 
-export default Person;
+export default TestEndpoint;

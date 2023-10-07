@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 
 import { AccessToken } from './api/bsf/AuthContext';
 import Login from './components/auth/Login';
-import Person from './components/TestEndpointComponent';
+import TestEndpoint from './components/TestEndpointComponent';
 import TokenCountdown from './components/auth/TokenCountdown';
 
 const isTokenValid = (token: AccessToken): boolean => {
@@ -37,7 +37,7 @@ function App() {
       <Login setAccessToken={setAccessToken} existingAccessToken={accessToken} />
       <textarea disabled id='tokenTextArea' value={JSON.stringify(accessToken, null, 2)}></textarea>
       <TokenCountdown accessToken={accessToken} />
-      <Person accessToken={accessToken} />
+      <TestEndpoint accessToken={accessToken} />
     </div>
   );
 }

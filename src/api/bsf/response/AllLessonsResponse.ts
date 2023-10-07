@@ -33,7 +33,7 @@ interface LessonDayQuestionScripture {
     };
 }
 
-interface LessonDayQuestion {
+export interface LessonDayQuestion {
     lessonDayQuestionId: number;
     questionNumber: number;
     questionSubNumber: null | string;
@@ -47,7 +47,7 @@ interface LessonDayTranslation {
     title: string;
 }
 
-interface LessonDay {
+export interface LessonDay {
     lessonDayId: number;
     lessonId: number;
     dayOfWeek: number;
@@ -63,7 +63,7 @@ interface LessonTranslation {
     focusVerse: null | string;
 }
 
-interface Lesson {
+export interface Lesson {
     lessonId: number;
     lessonNumber: number;
     scripture: string;
@@ -74,7 +74,7 @@ interface Lesson {
     lessonDays: Array<LessonDay>;
 }
 
-interface Study {
+export interface Study {
     studyId: number;
     code: string;
     displayName: string;
