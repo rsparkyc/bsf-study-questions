@@ -1,0 +1,69 @@
+.left-nav {
+    font-family: Arial, sans-serif;
+    width: 250px;
+    background-color: #f4f4f4;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.left-nav a {
+    text-decoration: none;
+    color: #333;
+    display: block;
+    padding: 5px 8px;
+    border-radius: 3px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.left-nav a:hover {
+    background-color: #007BFF;  /* Deep blue color for hover */
+    color: #ffffff;  /* White text on hover */
+}
+
+/* Main studies level */
+.left-nav div {
+    background-color: #E6F2FF;  /* Light blue tint */
+    margin-bottom: 8px;
+}
+
+/* Expanded study */
+.left-nav div > div {
+    background-color: #B3D1FF;  /* A bit deeper blue tint for lessons */
+    margin: 8px 0;
+}
+
+/* Expanded lesson within a study */
+.left-nav div > div > div {
+    background-color: #99C2FF;  /* Deeper still for lesson days */
+    margin: 8px 0;
+}
+
+.left-nav div:hover,
+.left-nav div > div:hover,
+.left-nav div > div > div:hover {
+    background-color: #80B2FF;  /* A general hover effect slightly deeper than the usual colors */
+}
+
+.left-nav div > div > a[href="#"]:hover,
+.left-nav div > div > div > a[href="#"]:hover {
+    border-left: 3px solid #0056B3;  /* Deep blue border for active indication */
+    padding-left: 5px;
+}
+
+.left-nav a:before {
+    content: '\25BA';  /* Right-pointing triangle for expandable sections */
+    display: inline-block;
+    margin-right: 10px;
+    transition: transform 0.3s;  /* Smooth transition for the rotation */
+}
+
+/* Rotating the triangle to indicate expanded sections */
+.left-nav div > div > a:before,
+.left-nav div > div > div > a:before {
+    transform: rotate(90deg);  /* 90 degrees rotation makes the triangle point downwards */
+}
+
+.left-nav a:hover:before {
+    color: #0056B3;  /* Changing the color of the triangle on hover for a unified look */
+}

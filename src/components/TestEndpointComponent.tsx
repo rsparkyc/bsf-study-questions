@@ -26,16 +26,6 @@ const TestEndpoint: React.FC<TokenProps> = ({ accessToken }) => {
         const response = await allLessonsRequest.makeRequest();
         setLessonData(response);
 
-        // Set the current study, lesson, and lesson day IDs
-        const currentStudy = response.data.studies[6];
-        setCurrentStudyId(currentStudy.studyId);
-        const currentLesson = currentStudy.lessons[3];
-        setCurrentLessonId(currentLesson.lessonId);
-        const currentLessonDay = currentLesson.lessonDays[0];
-        if (currentLessonDay) {
-          setCurrentLessonDayId(currentLessonDay.lessonDayId);
-        }
-        
       }
 
       fetchData();
@@ -47,13 +37,13 @@ const TestEndpoint: React.FC<TokenProps> = ({ accessToken }) => {
         studyId={currentStudyId} 
         lessonId={currentLessonId} 
         lessonDayId={currentLessonDayId}
+        setData={{ setCurrentStudyId, setCurrentLessonId, setCurrentLessonDayId }}
         data={lessonData} />
-        <LeftNav 
-          data={lessonData} 
-          setCurrentStudyId={setCurrentStudyId} 
-          setCurrentLessonId={setCurrentLessonId}
-          setCurrentLessonDayId={setCurrentLessonDayId}
-      />
+      <LeftNav 
+        data={lessonData} 
+        setCurrentStudyId={setCurrentStudyId} 
+        setCurrentLessonId={setCurrentLessonId}
+        setCurrentLessonDayId={setCurrentLessonDayId} />
 
     </div>
   );
