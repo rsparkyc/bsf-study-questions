@@ -8,11 +8,15 @@ interface LeftNavProps {
     setCurrentStudyId: (id: number) => void;
     setCurrentLessonId: (id: number) => void;
     setCurrentLessonDayId: (id: number) => void;
+    initialExpandedStudyId?: number;  // These might be undefined if not set in localStorage
+    initialExpandedLessonId?: number;
+
 }
 
-const LeftNav: React.FC<LeftNavProps> = ({ data, setCurrentStudyId, setCurrentLessonId, setCurrentLessonDayId }) => {
-    const [expandedStudyId, setExpandedStudyId] = useState<number | null>(null);
-    const [expandedLessonId, setExpandedLessonId] = useState<number | null>(null);
+const LeftNav: React.FC<LeftNavProps> = ({ data, setCurrentStudyId, setCurrentLessonId, setCurrentLessonDayId, initialExpandedStudyId, initialExpandedLessonId }) => {
+    const [expandedStudyId, setExpandedStudyId] = useState<number | null>(initialExpandedStudyId || null);
+    const [expandedLessonId, setExpandedLessonId] = useState<number | null>(initialExpandedLessonId || null);
+
 
     if (!data)  {
         return <div>Loading Study Information...</div>;
@@ -22,6 +26,7 @@ const LeftNav: React.FC<LeftNavProps> = ({ data, setCurrentStudyId, setCurrentLe
         setExpandedStudyId(prev => 
             prev === studyId ? null : studyId
         );
+        localStorage.setItem('currentStudyId', studyId.toString());
         setCurrentStudyId(studyId);
     };
 
@@ -29,8 +34,14 @@ const LeftNav: React.FC<LeftNavProps> = ({ data, setCurrentStudyId, setCurrentLe
         setExpandedLessonId(prev => 
             prev === lessonId ? null : lessonId
         );
+        localStorage.setItem('currentLessonId', lessonId.toString());
         setCurrentLessonId(lessonId);
     };
+
+    const toggleLessonDay = (lessonDayId: number) => {
+        localStorage.setItem('currentLessonDayId', lessonDayId.toString());
+        setCurrentLessonDayId(lessonDayId);
+    }
 
     return (
         <div className="left-nav">
@@ -42,7 +53,7 @@ const LeftNav: React.FC<LeftNavProps> = ({ data, setCurrentStudyId, setCurrentLe
                             <a href="#" onClick={(e) => { e.preventDefault(); toggleLesson(lesson.lessonId); }}>{lesson.title}</a>
                             {expandedLessonId === lesson.lessonId && lesson.lessonDays.map((day) => (
                                 <div key={day.lessonDayId} style={{ marginLeft: '20px' }}>
-                                    <a href="#" onClick={(e) => { e.preventDefault(); setCurrentLessonDayId(day.lessonDayId); }}>Day {day.dayOfWeek}</a>
+                                    <a href="#" onClick={(e) => { e.preventDefault(); toggleLessonDay(day.lessonDayId); }}>Day {day.dayOfWeek}</a>
                                 </div>
                             ))}
                         </div>

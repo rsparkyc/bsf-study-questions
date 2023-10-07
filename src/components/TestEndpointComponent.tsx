@@ -20,6 +20,11 @@ const TestEndpoint: React.FC<TokenProps> = ({ accessToken }) => {
   const [currentLessonId, setCurrentLessonId] = useState<number | undefined>();
   const [currentLessonDayId, setCurrentLessonDayId] = useState<number | undefined>();
 
+  const savedStudyId = Number(localStorage.getItem('currentStudyId') || '0');
+  const savedLessonId = Number(localStorage.getItem('currentLessonId') || '0');
+  const savedLessonDayId = Number(localStorage.getItem('currentLessonDayId') || '0');
+
+
   
   useEffect(() => {
       // Fetch your API data here and set it to the state
@@ -28,6 +33,10 @@ const TestEndpoint: React.FC<TokenProps> = ({ accessToken }) => {
         const allLessonsRequest = new AllLessonsRequest(authContext);
         const response = await allLessonsRequest.makeRequest();
         setLessonData(response);
+
+        if (savedStudyId) setCurrentStudyId(Number(savedStudyId));
+        if (savedLessonId) setCurrentLessonId(Number(savedLessonId));
+        if (savedLessonDayId) setCurrentLessonDayId(Number(savedLessonDayId));
 
       }
 
@@ -47,7 +56,10 @@ const TestEndpoint: React.FC<TokenProps> = ({ accessToken }) => {
           data={lessonData} 
           setCurrentStudyId={setCurrentStudyId} 
           setCurrentLessonId={setCurrentLessonId}
-          setCurrentLessonDayId={setCurrentLessonDayId} />
+          setCurrentLessonDayId={setCurrentLessonDayId}
+          initialExpandedStudyId={Number(savedStudyId)}
+          initialExpandedLessonId={Number(savedLessonId)}
+       />
 
         {currentLessonDayId && lessonData && (
             <LessonAreaComponent 
