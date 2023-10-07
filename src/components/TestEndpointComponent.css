@@ -1,0 +1,26 @@
+.test-endpoint-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.left-nav {
+    /* fixed width or percentage, depending on your design preference */
+    width: 20%;
+    /* other styles for the nav */
+}
+
+/* add a class to the main content container in LessonAreaComponent for better styling */
+.lesson-area {
+    /* takes the remaining width */
+    flex-grow: 1;
+    padding-left: 20px; /* optional: for some spacing between the nav and content */
+}
+
+.lesson-area textarea {
+    width: 80%;
+}
+
+
+.content-row {
+    display: flex;
+}

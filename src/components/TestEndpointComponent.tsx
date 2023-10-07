@@ -1,3 +1,5 @@
+import './TestEndpointComponent.css';
+
 import { AccessToken, AuthContextHolder } from '../api/bsf/AuthContext';
 import React, {useEffect, useState} from 'react';
 
@@ -5,6 +7,7 @@ import { AllLessonsRequest } from '../api/bsf/requests/AllLessonsRequest';
 import AllLessonsResponse from '../api/bsf/response/AllLessonsResponse';
 import Breadcrumbs from './Breadcrumbs';
 import LeftNav from './LeftNav';
+import LessonAreaComponent from './LessonAreaComponent';
 
 interface TokenProps {
   accessToken: AccessToken;
@@ -39,12 +42,22 @@ const TestEndpoint: React.FC<TokenProps> = ({ accessToken }) => {
         lessonDayId={currentLessonDayId}
         setData={{ setCurrentStudyId, setCurrentLessonId, setCurrentLessonDayId }}
         data={lessonData} />
-      <LeftNav 
-        data={lessonData} 
-        setCurrentStudyId={setCurrentStudyId} 
-        setCurrentLessonId={setCurrentLessonId}
-        setCurrentLessonDayId={setCurrentLessonDayId} />
+      <div className="content-row">
+        <LeftNav 
+          data={lessonData} 
+          setCurrentStudyId={setCurrentStudyId} 
+          setCurrentLessonId={setCurrentLessonId}
+          setCurrentLessonDayId={setCurrentLessonDayId} />
 
+        {currentLessonDayId && lessonData && (
+            <LessonAreaComponent 
+                lessonDay={lessonData.data.studies
+                    .flatMap(study => study.lessons)
+                    .flatMap(lesson => lesson.lessonDays)
+                    .find(day => day.lessonDayId === currentLessonDayId)}
+            />
+        )}
+      </div>
     </div>
   );
 };
