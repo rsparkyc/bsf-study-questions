@@ -1,19 +1,15 @@
 import './LessonContainerComponent.css';
 
-import { AccessToken, AuthContextHolder } from '../api/bsf/AuthContext';
 import React, {useEffect, useState} from 'react';
 
 import { AllLessonsRequest } from '../api/bsf/requests/AllLessonsRequest';
 import AllLessonsResponse from '../api/bsf/response/AllLessonsResponse';
+import { AuthContextHolder } from '../api/bsf/AuthContext';
 import Breadcrumbs from './Breadcrumbs';
 import LeftNav from './LeftNav';
 import LessonAreaComponent from './LessonAreaComponent';
 
-interface TokenProps {
-  accessToken: AccessToken;
-}
-
-const LessonContainer: React.FC<TokenProps> = ({ accessToken }) => {
+const LessonContainer: React.FC = () => {
 
   const [lessonData, setLessonData] = useState<AllLessonsResponse | undefined>();
   const [currentStudyId, setCurrentStudyId] = useState<number | undefined>();
@@ -43,6 +39,7 @@ const LessonContainer: React.FC<TokenProps> = ({ accessToken }) => {
       }
 
       fetchData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

@@ -1,6 +1,5 @@
 import AllLessonsResponse from '../api/bsf/response/AllLessonsResponse';
 import React from 'react';
-import exp from 'constants';
 
 interface BreadcrumbsProps {
     studyId?: number;
@@ -25,10 +24,46 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ studyId, lessonId, lessonDayI
 
     return (
         <div>
-            <a href="#" onClick={(e) => { e.preventDefault(); setData.setCurrentStudyId(undefined); setData.setCurrentLessonId(undefined); setData.setCurrentLessonDayId(undefined); }}>Studies</a> &gt; 
-            {study && <a href="#" onClick={(e) => { e.preventDefault(); setData.setCurrentLessonId(undefined); setData.setCurrentLessonDayId(undefined); }}>{study.displayName}</a>} &gt;
-            {lesson && <a href="#" onClick={(e) => { e.preventDefault(); setData.setCurrentLessonDayId(undefined); }}>{lesson.title}</a>} &gt;
-            {lessonDay && <a href="#">Day {lessonDay.dayOfWeek}</a>}
+            <button 
+                className="href-button"
+                onClick={() => {
+                    setData.setCurrentStudyId(undefined);
+                    setData.setCurrentLessonId(undefined);
+                    setData.setCurrentLessonDayId(undefined);
+                }}>
+                Studies
+            </button> &gt;
+
+            {study && (
+                <>
+                    <button 
+                        className="href-button"
+                        onClick={() => {
+                            setData.setCurrentLessonId(undefined);
+                            setData.setCurrentLessonDayId(undefined);
+                        }}>
+                        {study.displayName}
+                    </button> &gt;
+                </>
+            )}
+
+            {lesson && (
+                <>
+                    <button 
+                        className="href-button"
+                        onClick={() => {
+                            setData.setCurrentLessonDayId(undefined);
+                        }}>
+                        {lesson.title}
+                    </button> &gt;
+                </>
+            )}
+
+            {lessonDay && (
+                <button className="href-button">
+                    Day {lessonDay.dayOfWeek}
+                </button>
+            )}
 
         </div>
     );

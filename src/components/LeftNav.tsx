@@ -47,13 +47,27 @@ const LeftNav: React.FC<LeftNavProps> = ({ data, setCurrentStudyId, setCurrentLe
         <div className="left-nav">
             {[...data.data.studies].reverse().map((study: Study) => (
                 <div key={study.studyId}>
-                    <a href="#" onClick={(e) => { e.preventDefault(); toggleStudy(study.studyId); }}>{study.displayName}</a>
+                    <button 
+                        className="href-button"
+                        aria-expanded={expandedStudyId === study.studyId}
+                        onClick={() => toggleStudy(study.studyId)}>
+                        {study.displayName}
+                    </button>
                     {expandedStudyId === study.studyId && study.lessons.map((lesson: Lesson) => (
                         <div key={lesson.lessonId} style={{ marginLeft: '20px' }}>
-                            <a href="#" onClick={(e) => { e.preventDefault(); toggleLesson(lesson.lessonId); }}>{lesson.title}</a>
+                            <button 
+                                className="href-button"
+                                aria-expanded={expandedLessonId === lesson.lessonId}
+                                onClick={() => toggleLesson(lesson.lessonId)}>
+                                {lesson.title}
+                            </button>
                             {expandedLessonId === lesson.lessonId && lesson.lessonDays.map((day) => (
                                 <div key={day.lessonDayId} style={{ marginLeft: '20px' }}>
-                                    <a href="#" onClick={(e) => { e.preventDefault(); toggleLessonDay(day.lessonDayId); }}>Day {day.dayOfWeek}</a>
+                                    <button 
+                                        className="href-button"
+                                        onClick={() => toggleLessonDay(day.lessonDayId)}>
+                                        Day {day.dayOfWeek}
+                                    </button>
                                 </div>
                             ))}
                         </div>
@@ -61,6 +75,7 @@ const LeftNav: React.FC<LeftNavProps> = ({ data, setCurrentStudyId, setCurrentLe
                 </div>
             ))}
         </div>
+    
     );
 }
 

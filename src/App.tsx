@@ -1,8 +1,8 @@
 import './App.css';
 
-import { AccessToken, AuthContextHolder } from './api/bsf/AuthContext';
 import { useEffect, useState } from 'react';
 
+import { AccessToken } from './api/bsf/AuthContext';
 import Login from './components/auth/Login';
 import TestEndpoint from './components/LessonContainerComponent';
 import TokenCountdown from './components/auth/TokenCountdown';
@@ -37,7 +37,7 @@ function App() {
       <Login setAccessToken={setAccessToken} existingAccessToken={accessToken} />
       <textarea disabled id='tokenTextArea' value={JSON.stringify(accessToken, null, 2)}></textarea>
       <TokenCountdown/>
-      <TestEndpoint accessToken={accessToken} />
+      <TestEndpoint />
     </div>
   );
 }
