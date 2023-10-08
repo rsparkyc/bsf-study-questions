@@ -1,4 +1,4 @@
-import './TestEndpointComponent.css';
+import './LessonContainerComponent.css';
 
 import { AccessToken, AuthContextHolder } from '../api/bsf/AuthContext';
 import React, {useEffect, useState} from 'react';
@@ -13,7 +13,7 @@ interface TokenProps {
   accessToken: AccessToken;
 }
 
-const TestEndpoint: React.FC<TokenProps> = ({ accessToken }) => {
+const LessonContainer: React.FC<TokenProps> = ({ accessToken }) => {
 
   const [lessonData, setLessonData] = useState<AllLessonsResponse | undefined>();
   const [currentStudyId, setCurrentStudyId] = useState<number | undefined>();
@@ -30,13 +30,15 @@ const TestEndpoint: React.FC<TokenProps> = ({ accessToken }) => {
       // Fetch your API data here and set it to the state
       async function fetchData() {
         const authContext = AuthContextHolder.getAuthContext();
-        const allLessonsRequest = new AllLessonsRequest(authContext);
-        const response = await allLessonsRequest.makeRequest();
-        setLessonData(response);
+        if (authContext.timeRemaining() > 0) {
+          const allLessonsRequest = new AllLessonsRequest(authContext);
+          const response = await allLessonsRequest.makeRequest();
+          setLessonData(response);
 
-        if (savedStudyId) setCurrentStudyId(Number(savedStudyId));
-        if (savedLessonId) setCurrentLessonId(Number(savedLessonId));
-        if (savedLessonDayId) setCurrentLessonDayId(Number(savedLessonDayId));
+          if (savedStudyId) setCurrentStudyId(Number(savedStudyId));
+          if (savedLessonId) setCurrentLessonId(Number(savedLessonId));
+          if (savedLessonDayId) setCurrentLessonDayId(Number(savedLessonDayId));
+        }
 
       }
 
@@ -44,7 +46,7 @@ const TestEndpoint: React.FC<TokenProps> = ({ accessToken }) => {
   }, []);
 
   return (
-    <div className="test-endpoint-container">
+    <div className="lesson-container">
       <Breadcrumbs 
         studyId={currentStudyId} 
         lessonId={currentLessonId} 
@@ -74,4 +76,4 @@ const TestEndpoint: React.FC<TokenProps> = ({ accessToken }) => {
   );
 };
 
-export default TestEndpoint;
+export default LessonContainer;

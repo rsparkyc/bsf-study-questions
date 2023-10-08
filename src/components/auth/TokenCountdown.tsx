@@ -1,41 +1,37 @@
 import React, { useEffect, useState } from 'react';
 
-import { AccessToken } from '../../api/bsf/AuthContext';
+import  { AuthContextHolder } from '../../api/bsf/AuthContext';
 
-interface TokenCountdownProps {
-  accessToken: AccessToken;
-}
-
-const TokenCountdown: React.FC<TokenCountdownProps> = ({ accessToken }) => {
+const TokenCountdown: React.FC = () => {
   const [remainingTime, setRemainingTime] = useState(0);
 
   useEffect(() => {
-    // Calculate initial time difference
-    if (!accessToken) {
-      setRemainingTime(-1);
-      return;
+    if (AuthContextHolder.hasAuthContext()) {
+      const authContext = AuthContextHolder.getAuthContext(); 
+      if (authContext.accessToken) {
+        setRemainingTime(authContext.timeRemaining());
+      
+        const timerId = setInterval(() => {
+          setRemainingTime(authContext.timeRemaining());
+
+          if (authContext.timeRemaining() <= 0) {
+            clearInterval(timerId);
+          }
+        }
+        , 1000);
+
+        // Clean up
+        return () => {
+          clearInterval(timerId);
+        };
+
+      }
+
     }
-    
-    const now = Math.floor(Date.now() / 1000); // Current time in seconds
-    setRemainingTime(accessToken.expires_on - now);
+    setRemainingTime(-1);
 
     // Update every second
-    const timerId = setInterval(() => {
-      const newNow = Math.floor(Date.now() / 1000);
-      const newRemainingTime = accessToken.expires_on - newNow;
-      setRemainingTime(newRemainingTime);
-
-      if (newRemainingTime <= 0) {
-        clearInterval(timerId);
-      }
-    }
-    , 1000);
-
-    // Clean up
-    return () => {
-      clearInterval(timerId);
-    };
-  }, [accessToken]);
+  }, []);
 
   return (
     <div>

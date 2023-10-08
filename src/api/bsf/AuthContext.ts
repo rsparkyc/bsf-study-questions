@@ -66,6 +66,15 @@ export default class AuthContext {
     this.codeChallenge = buildCodeChallenge(this.codeVerify);
   }
 
+  public timeRemaining(): number {
+    if (!this.accessToken) {
+      return -1;
+    }
+    const now = new Date().getTime();
+    const expiresOn = this.accessToken.expires_on * 1000;
+    return Math.floor((expiresOn - now) / 1000);
+  }
+
 }
 
 function uuidV4(): string {
