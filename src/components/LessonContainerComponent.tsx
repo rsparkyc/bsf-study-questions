@@ -23,8 +23,6 @@ const LessonContainer: React.FC = () => {
   const savedLessonId = Number(localStorage.getItem('currentLessonId') || '0');
   const savedLessonDayId = Number(localStorage.getItem('currentLessonDayId') || '0');
 
-  console.log("Rendering LessonContainerComponent");
-
   
   useEffect(() => {
       // Fetch your API data here and set it to the state

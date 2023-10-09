@@ -7,7 +7,12 @@ import { ConfirmedRequest } from '../../api/bsf/requests/auth/ConfirmedRequest';
 import { SelfAssertedRequest } from '../../api/bsf/requests/auth/SelfAssertedRequest';
 import { TokenRequest } from '../../api/bsf/requests/auth/TokenRequest';
 
-const LoginPage: React.FC = () => {
+interface LoginPageProps {
+  onLoginStateChange: (loggedIn: boolean) => void;
+}
+
+const LoginPage: React.FC<LoginPageProps> = ({ onLoginStateChange }) => {
+
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
@@ -22,6 +27,7 @@ const LoginPage: React.FC = () => {
             const parsedToken: AccessToken = JSON.parse(savedToken);
             setAccessToken(parsedToken);
             setIsLoggedIn(true); // Assuming you will also save user's email or name in local storage or can decode it from the token
+
             // Here, you would also set the user's name/email
             const decodedPayload = decodeJWT(parsedToken.access_token);
             if (decodedPayload) {
@@ -52,7 +58,6 @@ const LoginPage: React.FC = () => {
         }
     };
 
-
     const handleLogin = async () => {
         // Handle API call to get the token using email and password
         const authContext = AuthContextHolder.buildOrGetAuthContext(email, password);
@@ -79,11 +84,13 @@ const LoginPage: React.FC = () => {
         localStorage.setItem('accessToken', JSON.stringify(newToken));
         setIsLoggedIn(true);
         setAccessToken(newToken);
+        onLoginStateChange(true);
         // TODO: Handle any errors and set the user's name/email
     };
 
     const handleLogout = () => {
         localStorage.removeItem('accessToken');
+        onLoginStateChange(false);
         setIsLoggedIn(false);
         setAccessToken(null);
     };

@@ -1,14 +1,10 @@
-import PersonResponse from '../response/PersonResponse'
 import AuthContext from '../AuthContext';
 import { BsfProxiedRequest } from './auth/BsfProxiedRequest';
+import PersonResponse from '../response/PersonResponse'
 
 export class PersonRequest extends BsfProxiedRequest<PersonResponse> {
   constructor(protected authContext: AuthContext) {
     super(authContext);
-  }
-
-  protected processResponse(response: any): void {
-    debugger;
   }
 
   protected generateUrl(): string {
