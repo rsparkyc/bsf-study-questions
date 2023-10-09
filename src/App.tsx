@@ -3,8 +3,8 @@ import './App.css';
 import { useEffect, useState } from 'react';
 
 import { AccessToken } from './api/bsf/AuthContext';
+import LessonContainer from './components/LessonContainerComponent';
 import Login from './components/auth/Login';
-import TestEndpoint from './components/LessonContainerComponent';
 import TokenCountdown from './components/auth/TokenCountdown';
 
 const isTokenValid = (token: AccessToken): boolean => {
@@ -37,7 +37,7 @@ function App() {
       <Login setAccessToken={setAccessToken} existingAccessToken={accessToken} />
       <textarea disabled id='tokenTextArea' value={JSON.stringify(accessToken, null, 2)}></textarea>
       <TokenCountdown/>
-      <TestEndpoint />
+      <LessonContainer />
     </div>
   );
 }

@@ -1,14 +1,23 @@
+import AnswersResponse from '../api/bsf/response/AnswersResponse';
 import { LessonDay } from '../api/bsf/response/AllLessonsResponse';
 import React from 'react';
 
 interface LessonDayProps {
     lessonDay: LessonDay| undefined;
+    answersData: AnswersResponse | undefined;
 }
 
-const LessonAreaComponent: React.FC<LessonDayProps> = ({ lessonDay }) => {
+const LessonAreaComponent: React.FC<LessonDayProps> = ({ lessonDay, answersData }) => {
     if (!lessonDay) {
         return <div>Loading Lesson Day Information...</div>;
     }
+
+    const getAnswerForQuestion = (questionId: number): string | undefined => {
+        const foundAnswer = answersData?.data.find(answer => answer.lessonDayQuestionId === questionId);
+        return foundAnswer?.answerText;
+    };
+
+
     return (
         <div className="lesson-area">
             {/* Display Lesson Day Title */}
@@ -46,7 +55,12 @@ const LessonAreaComponent: React.FC<LessonDayProps> = ({ lessonDay }) => {
                             </ul>
                         )}
                         {/* Provide Input area to answer the question */}
-                        <textarea placeholder="Write your answer here..." rows={4} />
+                        <textarea 
+                            placeholder="Write your answer here..." 
+                            rows={4}
+                            defaultValue={getAnswerForQuestion(question.lessonDayQuestionId)}
+                        />
+
                     </div>
                 ))}
             </div>
