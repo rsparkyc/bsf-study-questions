@@ -1,7 +1,7 @@
 import './LoginPage.css';
 
 import { AccessToken, AuthContextHolder } from '../../api/bsf/AuthContext';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import { AuthorizeRequest } from '../../api/bsf/requests/auth/AuthorizeRequest';
 import { ConfigurationRequest } from '../../api/bsf/requests/auth/ConfigurationRequest';
@@ -20,7 +20,6 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginStateChange }) => {
     const [password, setPassword] = useState<string>('');
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
     const [user, setUser] = useState<string>('');
-    const [tokenExpiry, setTokenExpiry] = useState<number>(0);
     const [accessToken, setAccessToken] = useState<AccessToken | null>(null);
 
     const [devMode, setDevMode] = useState<boolean>(false);
@@ -28,25 +27,6 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginStateChange }) => {
 
 
     // Check if already logged in
-    useEffect(() => {
-        const savedToken = localStorage.getItem('accessToken');
-        if (savedToken) {
-            const parsedToken: AccessToken = JSON.parse(savedToken);
-            setAccessToken(parsedToken);
-            AuthContextHolder.buildFromToken(parsedToken);
-            setIsLoggedIn(true); // Assuming you will also save user's email or name in local storage or can decode it from the token
-
-            // Here, you would also set the user's name/email
-            const decodedPayload = decodeJWT(parsedToken.access_token);
-            if (decodedPayload) {
-                const firstName = decodedPayload.given_name;
-                const lastName = decodedPayload.family_name; 
-
-                setUser(`${firstName} ${lastName}`);
-            }
-        }
-    }, []);
-
     const decodeJWT = (token: string): {given_name: string, family_name: string} | null => {
         try {
             // Get the payload, which is the second part of the token
@@ -89,11 +69,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginStateChange }) => {
         
         const newToken = authContext.accessToken;
         
-        localStorage.setItem('accessToken', JSON.stringify(newToken));
-        setIsLoggedIn(true);
-        setAccessToken(newToken);
-        onLoginStateChange(true);
-        // TODO: Handle any errors and set the user's name/email
+        setLoggedIn(newToken);
     };
 
     const handleLogout = () => {
@@ -108,7 +84,44 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginStateChange }) => {
         setDevMode(!devMode);
     };
 
-    const calculateTokenTimeLeft = () => {
+    const setLoggedIn = useCallback(async (accessToken:AccessToken) => {
+        localStorage.setItem('accessToken', JSON.stringify(accessToken));
+        setAccessToken(accessToken);
+        onLoginStateChange(true);
+        setIsLoggedIn(true);
+
+        // Here, you would also set the user's name/email
+        const decodedPayload = decodeJWT(accessToken.access_token);
+        if (decodedPayload) {
+            const firstName = decodedPayload.given_name;
+            const lastName = decodedPayload.family_name; 
+
+            setUser(`${firstName} ${lastName}`);
+        }
+    }, [onLoginStateChange]);
+
+    useEffect(() => {
+        const savedToken = localStorage.getItem('accessToken');
+        if (savedToken) {
+            const parsedToken: AccessToken = JSON.parse(savedToken);
+            AuthContextHolder.buildFromToken(parsedToken);
+            setLoggedIn(parsedToken);
+
+        }
+    }, [setLoggedIn]);
+
+    const doTokenRefresh = useCallback(async () => {
+        if (AuthContextHolder.hasAuthContext()) {
+            const authContext = AuthContextHolder.getAuthContext();
+            const refreshTokenRequest = new RefreshTokenRequest(authContext);
+            await refreshTokenRequest.makeRequest();
+            if (authContext.accessToken) {
+                setLoggedIn(authContext.accessToken);
+            }
+        }
+    }, [setLoggedIn]);
+
+    const calculateTokenTimeLeft = useCallback(() => {
         if (accessToken) {
             const expirationTime = accessToken.expires_on * 1000; // JWT times are in seconds
             const now = new Date().getTime();
@@ -120,33 +133,13 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginStateChange }) => {
                 doTokenRefresh();
             }
         }
-    };
+    }, [accessToken, doTokenRefresh]);
 
     // Effect to update token time left every second
     useEffect(() => {
         const interval = setInterval(calculateTokenTimeLeft, 1000);
         return () => clearInterval(interval);
-    }, [accessToken]);
-
-    const doTokenRefresh = async () => {
-        if (AuthContextHolder.hasAuthContext()) {
-            const authContext = AuthContextHolder.getAuthContext();
-            const refreshTokenRequest = new RefreshTokenRequest(authContext);
-            await refreshTokenRequest.makeRequest();
-            if (authContext.accessToken) {
-                localStorage.setItem('accessToken', JSON.stringify(authContext.accessToken));
-                setAccessToken(authContext.accessToken);
-                onLoginStateChange(true);
-            }
-        }
-    };
-
-    const setLoggedIn = async (accessToken:AccessToken) => {
-        localStorage.setItem('accessToken', JSON.stringify(accessToken));
-        setAccessToken(accessToken);
-        onLoginStateChange(true);
-        setIsLoggedIn(true);
-    }
+    }, [accessToken, calculateTokenTimeLeft]);
 
 
     return (
@@ -164,7 +157,6 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginStateChange }) => {
                 <div>
                     Logged in as {user}
                     <button onClick={handleLogout}>Logout</button>
-                    {/* Add your Dev Mode button here */}
                 </div>
             ) : (
                 <div>
