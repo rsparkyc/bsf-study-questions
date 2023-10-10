@@ -25,6 +25,12 @@ const LessonAreaComponent: React.FC<LessonDayProps> = ({ lessonDay, answersData,
     };
 
     const handleAnswerChange = debounce((questionId: number, answerText: string) => {
+        if (answersData) {
+            const ans = answersData.data.find(answer => answer.lessonDayQuestionId === questionId);
+            if (ans) {
+                ans.answerText = answerText;
+            }
+        }
         const saveRequest = new SaveQuestionRequest(AuthContextHolder.getAuthContext(), questionId, answerText);
         saveRequest.makeRequest();
     }, 2000); 
