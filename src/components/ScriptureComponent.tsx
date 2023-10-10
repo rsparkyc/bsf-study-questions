@@ -18,6 +18,7 @@ const Scripture: React.FC<ScriptureProps> = ({ scriptureData, verseReferences}) 
     };
 
     function unescapeString(s: string): string {
+        // eslint-disable-next-line no-new-func
         return new Function(`return ${s};`)();
     }
 
@@ -59,8 +60,6 @@ const Scripture: React.FC<ScriptureProps> = ({ scriptureData, verseReferences}) 
 
     const parsedHTML = new DOMParser().parseFromString(unescapeString(scriptureData.htmlContent), 'text/html');
     const transformedContent = transformScriptureContent(Array.from(parsedHTML.body.childNodes));
-
-
 
     return (
         <div className="scripture">
