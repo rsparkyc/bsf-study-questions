@@ -116,6 +116,12 @@ export class AuthContextHolder {
     return this.getAuthContext();
   }
 
+  static buildFromToken(token: AccessToken):AuthContext {
+    this.authContext = new AuthContext({ email: "", password: ""}, "");
+    this.authContext.accessToken = token;
+    return this.getAuthContext();
+  }
+
   static hasAuthContext():boolean {
     return this.authContext !== null;
   }

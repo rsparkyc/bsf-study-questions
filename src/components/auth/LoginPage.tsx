@@ -1,9 +1,12 @@
+import './LoginPage.css';
+
 import { AccessToken, AuthContextHolder } from '../../api/bsf/AuthContext';
 import React, { useEffect, useState } from 'react';
 
 import { AuthorizeRequest } from '../../api/bsf/requests/auth/AuthorizeRequest';
 import { ConfigurationRequest } from '../../api/bsf/requests/auth/ConfigurationRequest';
 import { ConfirmedRequest } from '../../api/bsf/requests/auth/ConfirmedRequest';
+import { RefreshTokenRequest } from '../../api/bsf/requests/auth/RefreshTokenRequest';
 import { SelfAssertedRequest } from '../../api/bsf/requests/auth/SelfAssertedRequest';
 import { TokenRequest } from '../../api/bsf/requests/auth/TokenRequest';
 
@@ -20,12 +23,17 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginStateChange }) => {
     const [tokenExpiry, setTokenExpiry] = useState<number>(0);
     const [accessToken, setAccessToken] = useState<AccessToken | null>(null);
 
+    const [devMode, setDevMode] = useState<boolean>(false);
+    const [tokenTimeLeft, setTokenTimeLeft] = useState<number>(accessToken?.expires_in || 0);
+
+
     // Check if already logged in
     useEffect(() => {
         const savedToken = localStorage.getItem('accessToken');
         if (savedToken) {
             const parsedToken: AccessToken = JSON.parse(savedToken);
             setAccessToken(parsedToken);
+            AuthContextHolder.buildFromToken(parsedToken);
             setIsLoggedIn(true); // Assuming you will also save user's email or name in local storage or can decode it from the token
 
             // Here, you would also set the user's name/email
@@ -96,9 +104,57 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginStateChange }) => {
     };
 
     // TODO: Add more JSX for input fields, buttons, token expiry monitoring, and the dev mode
+    const toggleDevMode = () => {
+        setDevMode(!devMode);
+    };
+
+    const calculateTokenTimeLeft = () => {
+        if (accessToken) {
+            const expirationTime = accessToken.expires_on * 1000; // JWT times are in seconds
+            const now = new Date().getTime();
+            const timeLeft = Math.floor((expirationTime - now) / 1000); // Convert to seconds
+            setTokenTimeLeft(timeLeft);
+        }
+    };
+
+    // Effect to update token time left every second
+    useEffect(() => {
+        const interval = setInterval(calculateTokenTimeLeft, 1000);
+        return () => clearInterval(interval);
+    }, [accessToken]);
+
+    const forceTokenRefresh = async () => {
+        if (AuthContextHolder.hasAuthContext()) {
+            const authContext = AuthContextHolder.getAuthContext();
+            const refreshTokenRequest = new RefreshTokenRequest(authContext);
+            await refreshTokenRequest.makeRequest();
+            if (authContext.accessToken) {
+                localStorage.setItem('accessToken', JSON.stringify(authContext.accessToken));
+                setAccessToken(authContext.accessToken);
+                onLoginStateChange(true);
+            }
+        }
+    };
+
+    const setLoggedIn = async (accessToken:AccessToken) => {
+        localStorage.setItem('accessToken', JSON.stringify(accessToken));
+        setAccessToken(accessToken);
+        onLoginStateChange(true);
+        setIsLoggedIn(true);
+    }
+
 
     return (
         <div>
+            {devMode && (
+                <div className="dev-mode-panel">
+                    <h3>Dev Mode</h3>
+                    <p><strong>Token:</strong> {JSON.stringify(accessToken, null, 2)}</p>
+                    <p><strong>Time Left:</strong> {tokenTimeLeft} seconds</p>
+                    <button onClick={forceTokenRefresh}>Force Token Refresh</button>
+                </div>
+            )}
+
             {isLoggedIn ? (
                 <div>
                     Logged in as {user}
@@ -113,6 +169,8 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginStateChange }) => {
                     <button onClick={handleLogin}>Login</button>
                 </div>
             )}
+            <button onClick={toggleDevMode}>Toggle Dev Mode</button>
+
         </div>
     );
 };
