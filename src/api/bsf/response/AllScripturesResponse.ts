@@ -1,4 +1,4 @@
-interface ScriptureData {
+export interface ScriptureData {
     scriptureId: number;
     languageId: number;
     displayText: string | null;

@@ -4,6 +4,7 @@ import { AuthContextHolder } from '../api/bsf/AuthContext';
 import { LessonDay } from '../api/bsf/response/AllLessonsResponse';
 import React from 'react';
 import { SaveQuestionRequest } from '../api/bsf/requests/SaveQuestionRequest';
+import Scripture from './ScriptureComponent';
 import debounce from 'lodash.debounce';
 
 interface LessonDayProps {
@@ -13,7 +14,7 @@ interface LessonDayProps {
 }
 
 
-const LessonAreaComponent: React.FC<LessonDayProps> = ({ lessonDay, answersData }) => {
+const LessonAreaComponent: React.FC<LessonDayProps> = ({ lessonDay, answersData, scripturesData }) => {
     if (!lessonDay) {
         return <div>Loading Lesson Day Information...</div>;
     }
@@ -33,18 +34,25 @@ const LessonAreaComponent: React.FC<LessonDayProps> = ({ lessonDay, answersData 
             {/* Display Lesson Day Title */}
             <h2>{lessonDay.lessonDayTranslations[0].title}</h2>
             
-            {/* Display Scripture References */}
-            <div className="scriptures">
+           <div className="scriptures">
                 <h3>Scriptures for the Day:</h3>
                 <ul>
-                    {lessonDay.lessonDayScriptures.map(scripture => (
-                        <li key={scripture.scriptureId}>
-                            {scripture.scripture.chapterVerses}
-                        </li>
-                    ))}
+                    {lessonDay.lessonDayScriptures.map(scriptureReference => {
+                        const matchingScripture = scripturesData?.data.find(s => s.scriptureId === scriptureReference.scriptureId);
+                        return (
+                            <li key={scriptureReference.scriptureId}>
+                                {matchingScripture && 
+                                    <Scripture 
+                                        scriptureData={matchingScripture} 
+                                        verseReferences={scriptureReference.scripture.chapterVerses}
+                                    />
+                                }
+                            </li>
+                        );
+                    })}
                 </ul>
             </div>
-            
+ 
             {/* Display Questions */}
             <div className="questions">
                 {lessonDay.lessonDayQuestions.map(question => (
@@ -57,11 +65,18 @@ const LessonAreaComponent: React.FC<LessonDayProps> = ({ lessonDay, answersData 
                         {/* List scriptures for the question, if any */}
                         {question.lessonDayQuestionScriptures.length > 0 && (
                             <ul>
-                                {question.lessonDayQuestionScriptures.map(qScripture => (
+                            {question.lessonDayQuestionScriptures.map(qScripture => {
+                                const matchingScripture = scripturesData?.data.find(s => s.scriptureId === qScripture.scriptureId);
+                                return (
                                     <li key={qScripture.scriptureId}>
-                                        {qScripture.scripture.chapterVerses}
+                                        {matchingScripture && <Scripture 
+                                            scriptureData={matchingScripture} 
+                                            verseReferences={qScripture.scripture.chapterVerses} 
+                                        />}
                                     </li>
-                                ))}
+                                );
+                            })}
+
                             </ul>
                         )}
                         {/* Provide Input area to answer the question */}
