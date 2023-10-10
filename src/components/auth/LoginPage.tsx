@@ -114,6 +114,11 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginStateChange }) => {
             const now = new Date().getTime();
             const timeLeft = Math.floor((expirationTime - now) / 1000); // Convert to seconds
             setTokenTimeLeft(timeLeft);
+
+            // do a refresh if there is less than 5 minutes left
+            if (timeLeft < 300) {
+                doTokenRefresh();
+            }
         }
     };
 
@@ -123,7 +128,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginStateChange }) => {
         return () => clearInterval(interval);
     }, [accessToken]);
 
-    const forceTokenRefresh = async () => {
+    const doTokenRefresh = async () => {
         if (AuthContextHolder.hasAuthContext()) {
             const authContext = AuthContextHolder.getAuthContext();
             const refreshTokenRequest = new RefreshTokenRequest(authContext);
@@ -151,7 +156,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginStateChange }) => {
                     <h3>Dev Mode</h3>
                     <p><strong>Token:</strong> {JSON.stringify(accessToken, null, 2)}</p>
                     <p><strong>Time Left:</strong> {tokenTimeLeft} seconds</p>
-                    <button onClick={forceTokenRefresh}>Force Token Refresh</button>
+                    <button onClick={doTokenRefresh}>Force Token Refresh</button>
                 </div>
             )}
 
