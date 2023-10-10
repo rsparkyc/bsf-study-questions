@@ -1,8 +1,10 @@
 import { AxiosResponse, Method } from 'axios';
+
 import AuthContext from '../../AuthContext';
 import { BsfProxiedRequest } from './BsfProxiedRequest';
+import { BsfRequest } from '../BsfRequest';
 
-export class TokenRequest extends BsfProxiedRequest<string> {
+export class TokenRequest extends BsfRequest<string> {
     constructor(protected authContext: AuthContext) {
         super(authContext);
     }
@@ -21,8 +23,8 @@ export class TokenRequest extends BsfProxiedRequest<string> {
     }
 
     protected generateUrl(): string {
-        return "https://login.mybsf.org/bsfmcaiamprod.onmicrosoft.com/b2c_1a_signuporsignin/oauth2/v2.0/token" +
-            "?client_id=" + this.authContext.clientId + "&" +
+        return "https://login.mybsf.org/bsfmcaiamprod.onmicrosoft.com/b2c_1a_signuporsignin/oauth2/v2.0/token?" +
+            "client_id=" + this.authContext.clientId + "&" +
             "redirect_uri=https://www.mybsf.org/&" +
             "scope=" + this.authContext.scope + "&" +
             "code=" + this.authContext.code + "&" +

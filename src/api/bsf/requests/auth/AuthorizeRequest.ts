@@ -1,5 +1,5 @@
-import { AxiosResponse } from 'axios';
 import AuthContext from '../../AuthContext';
+import { AxiosResponse } from 'axios';
 import { BsfProxiedRequest } from './BsfProxiedRequest';
 
 export class AuthorizeRequest extends BsfProxiedRequest<string> {
@@ -8,7 +8,6 @@ export class AuthorizeRequest extends BsfProxiedRequest<string> {
   }
 
   protected processResponse(response: AxiosResponse): void {
-    console.log("response: " + JSON.stringify(response));
     const cookieStringWithBracktes: string = response.headers['x-c-data'] || '';
     const cookieString: string = cookieStringWithBracktes.substring(1, cookieStringWithBracktes.length - 1);
 

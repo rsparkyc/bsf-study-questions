@@ -1,3 +1,4 @@
+import AllScripturesResponse from '../api/bsf/response/AllScripturesResponse';
 import AnswersResponse from '../api/bsf/response/AnswersResponse';
 import { AuthContextHolder } from '../api/bsf/AuthContext';
 import { LessonDay } from '../api/bsf/response/AllLessonsResponse';
@@ -6,9 +7,11 @@ import { SaveQuestionRequest } from '../api/bsf/requests/SaveQuestionRequest';
 import debounce from 'lodash.debounce';
 
 interface LessonDayProps {
-    lessonDay: LessonDay| undefined;
+    lessonDay: LessonDay | undefined;
     answersData: AnswersResponse | undefined;
+    scripturesData: AllScripturesResponse | undefined;
 }
+
 
 const LessonAreaComponent: React.FC<LessonDayProps> = ({ lessonDay, answersData }) => {
     if (!lessonDay) {
