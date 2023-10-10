@@ -35,17 +35,3 @@
     font-size: 0.7em;
     color: #666;
 }
-
-.popover-content {
-    display: none;
-    position: absolute;
-    background: white;
-    border: 1px solid #ccc;
-    padding: 10px;
-    width: 200px;
-    z-index: 10;
-}
-
-div:hover .popover-content {
-    display: block;
-}

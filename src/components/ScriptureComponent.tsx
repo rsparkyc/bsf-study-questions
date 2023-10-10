@@ -1,5 +1,7 @@
 import './ScriptureComponent.css';
 
+import { PopoverComponent } from './PopoverComponent';
+import React from 'react';
 import { ScriptureData } from "../api/bsf/response/AllScripturesResponse";
 import { useState } from "react";
 
@@ -19,43 +21,45 @@ const Scripture: React.FC<ScriptureProps> = ({ scriptureData, verseReferences}) 
         return new Function(`return ${s};`)();
     }
 
-    const transformScriptureContent = (rawHTML: string) => {
-        const parsedHTML = new DOMParser().parseFromString(unescapeString(rawHTML), 'text/html');
-        
-        Array.from(parsedHTML.querySelectorAll('span[data-caller="+"]')).forEach(span => {
-            // Create a container for the emoji and popover
-            const container = document.createElement('span');
-            container.className = 'popover-container';
-            
-            // Create the notepad emoji span
-            const emojiSpan = document.createElement('span');
-            emojiSpan.innerText = '🗒️'; // notepad emoji
-            emojiSpan.className = 'emoji';
-            emojiSpan.onmouseenter = () => { alert('hello'); contentSpan.style.display = 'block'; };
-            emojiSpan.onmouseleave = () => { contentSpan.style.display = 'none'; };
 
-            // Move content from span to container and hide it initially
-            const contentSpan = document.createElement('span');
-            contentSpan.className = 'popover-content';
-            contentSpan.style.display = 'none';
-            
-            while (span.firstChild) {
-                contentSpan.appendChild(span.firstChild);
+    const transformScriptureContent = (nodes: ChildNode[]): React.ReactNode[] => {
+        const result: React.ReactNode[] = [];
+
+        nodes.forEach((node, index) => {
+            if (node.nodeType === Node.ELEMENT_NODE) {
+                const elem = node as Element;
+                const tagName = elem.tagName.toLowerCase();
+
+                const attributes: { [key: string]: any } = {};
+
+                Array.from(elem.attributes).forEach(attr => {
+                    if (attr.name === 'class') {
+                        attributes.className = attr.value;
+                    } else {
+                        attributes[attr.name] = attr.value;
+                    }
+                });
+
+                if (elem.getAttribute('data-caller') === '+') {
+                    const content = elem.innerHTML;
+                    result.push(<PopoverComponent content={content} />);
+                } else {
+                    // Recursively process child nodes of this element
+                    const children = transformScriptureContent(Array.from(elem.childNodes));
+                    const element = React.createElement(tagName, { ...attributes, key: index }, ...children);
+                    result.push(element);
+                }
+            } else {
+                result.push(node.textContent || null);
             }
-            container.appendChild(contentSpan);
-            
-            // Add the emoji to the container
-            container.insertBefore(emojiSpan, container.firstChild);
-
-            // Replace the original span with the container in the parsed HTML
-            span.replaceWith(container);
         });
 
-        // Return the modified outerHTML
-        return parsedHTML.body.innerHTML;
+        return result;
     };
 
-    const transformedContent = transformScriptureContent(scriptureData.htmlContent);
+    const parsedHTML = new DOMParser().parseFromString(unescapeString(scriptureData.htmlContent), 'text/html');
+    const transformedContent = transformScriptureContent(Array.from(parsedHTML.body.childNodes));
+
 
 
     return (
@@ -64,9 +68,12 @@ const Scripture: React.FC<ScriptureProps> = ({ scriptureData, verseReferences}) 
                 {scriptureData.name} {verseReferences}
             </button>
             {isExpanded && 
-                <div className="expanded-scripture" dangerouslySetInnerHTML={{ __html: transformedContent}} />
+                <div className="expanded-scripture">
+                    {transformedContent}
+                </div>
             }
         </div>
+
     );
 }
 

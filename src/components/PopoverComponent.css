@@ -1,13 +1,48 @@
-.popover-content {
-    display: none;
-    position: absolute;
-    background: white;
-    border: 1px solid #ccc;
-    padding: 10px;
-    width: 200px;
-    z-index: 10;
+.popover-container {
+    position: relative;
+    display: inline-block;
+    /* To keep it inline with surrounding content */
 }
 
-div:hover .popover-content {
+.popover-content {
     display: block;
+    /* Hidden by default */
+    left: 20%;
+    position: absolute;
+    /* Adjust for perfect centering */
+    z-index: 1000;
+    /* Ensuring it stays on top */
+    background-color: white;
+    /* Adjust as needed */
+    border: 1px solid #ccc;
+    /* Giving it a boundary */
+    padding: 8px;
+    width: 400px;
+    /* Or whatever width you want */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    /* Optional shadow for a bit of depth */
+}
+
+/* Styles for span with class 'fr' */
+.popover-content .fr {
+    font-weight: bold;
+    /* make it bold */
+    color: #333;
+    /* dark color for visibility */
+}
+
+/* Styles for span with class 'ft' */
+.popover-content .ft {
+    font-style: italic;
+    /* italicized text */
+    color: #777;
+    /* slightly lighter than .fr */
+}
+
+/* Styles for span with class 'fqa' */
+.popover-content .fqa {
+    color: #555;
+    /* somewhere between .fr and .ft */
+    text-decoration: underline;
+    /* underlined text */
 }
