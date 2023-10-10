@@ -1,6 +1,5 @@
 import * as buffer from 'buffer';
 
-//import crypto from 'crypto-browserify';
 import CryptoJS from 'crypto-js';
 import randomBytes from 'randombytes';
 
@@ -26,7 +25,6 @@ export interface AccessToken {
 
 export default class AuthContext {
 
-  positionCodeUsed: string;
   credentials: Credentials;
   accessToken?: AccessToken;
   nonce: string;
@@ -41,8 +39,9 @@ export default class AuthContext {
   clientId?: string;
   apiEndpoints?: { [key: string]: string };
   encodedSessionContext?: string;
+  personId?: number;
 
-  constructor(credentials: Credentials, positionCodeUsed: string) {
+  constructor(credentials: Credentials) {
     this.clientRequestId = uuidV4();
     const plainTextState = JSON.stringify({
       id: uuidV4(),
@@ -53,7 +52,6 @@ export default class AuthContext {
     this.codeVerify = randomString(43, 128);
     this.codeChallenge = buildCodeChallenge(this.codeVerify);
     this.credentials = credentials;
-    this.positionCodeUsed = positionCodeUsed;
   }
 
   public rebuildCodeChallenge(codeVerify?: string) {
@@ -73,6 +71,13 @@ export default class AuthContext {
     const now = new Date().getTime();
     const expiresOn = this.accessToken.expires_on * 1000;
     return Math.floor((expiresOn - now) / 1000);
+  }
+
+  public getPersonId(): number {
+    if (!this.personId) {
+      throw new Error("PersonId not set");
+    }
+    return this.personId;
   }
 
 }
@@ -111,13 +116,13 @@ export class AuthContextHolder {
 
   static buildOrGetAuthContext(email: string, password: string, forceRebuild?:boolean):AuthContext {
     if (forceRebuild || !this.authContext || this.authContext.credentials.email !== email || this.authContext.credentials.password !== password) {
-      this.authContext = new AuthContext({ email: email, password: password}, "");
+      this.authContext = new AuthContext({ email: email, password: password});
     }
     return this.getAuthContext();
   }
 
   static buildFromToken(token: AccessToken):AuthContext {
-    this.authContext = new AuthContext({ email: "", password: ""}, "");
+    this.authContext = new AuthContext({ email: "", password: ""});
     this.authContext.accessToken = token;
     return this.getAuthContext();
   }

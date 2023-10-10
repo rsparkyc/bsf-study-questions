@@ -6,6 +6,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { AuthorizeRequest } from '../../api/bsf/requests/auth/AuthorizeRequest';
 import { ConfigurationRequest } from '../../api/bsf/requests/auth/ConfigurationRequest';
 import { ConfirmedRequest } from '../../api/bsf/requests/auth/ConfirmedRequest';
+import { PersonRequest } from '../../api/bsf/requests/PersonRequest';
 import { RefreshTokenRequest } from '../../api/bsf/requests/auth/RefreshTokenRequest';
 import { SelfAssertedRequest } from '../../api/bsf/requests/auth/SelfAssertedRequest';
 import { TokenRequest } from '../../api/bsf/requests/auth/TokenRequest';
@@ -65,6 +66,9 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginStateChange }) => {
 
             const tokenRequest = new TokenRequest(authContext);
             await tokenRequest.makeRequest();
+
+            const personRequest = new PersonRequest(authContext);
+            await personRequest.makeRequest();
         }
         
         const newToken = authContext.accessToken;

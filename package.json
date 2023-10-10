@@ -10,6 +10,7 @@
     "buffer": "^6.0.3",
     "crypto": "^1.0.1",
     "crypto-js": "^4.1.1",
+    "lodash.debounce": "^4.0.8",
     "randombytes": "^2.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -45,6 +46,7 @@
   },
   "devDependencies": {
     "@types/crypto-js": "^4.1.2",
+    "@types/lodash.debounce": "^4.0.7",
     "@types/node": "^20.6.3",
     "@types/randombytes": "^2.0.0",
     "jest": "^27.5.1",

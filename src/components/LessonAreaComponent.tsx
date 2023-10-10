@@ -1,6 +1,9 @@
 import AnswersResponse from '../api/bsf/response/AnswersResponse';
+import { AuthContextHolder } from '../api/bsf/AuthContext';
 import { LessonDay } from '../api/bsf/response/AllLessonsResponse';
 import React from 'react';
+import { SaveQuestionRequest } from '../api/bsf/requests/SaveQuestionRequest';
+import debounce from 'lodash.debounce';
 
 interface LessonDayProps {
     lessonDay: LessonDay| undefined;
@@ -17,6 +20,10 @@ const LessonAreaComponent: React.FC<LessonDayProps> = ({ lessonDay, answersData 
         return foundAnswer?.answerText;
     };
 
+    const handleAnswerChange = debounce((questionId: number, answerText: string) => {
+        const saveRequest = new SaveQuestionRequest(AuthContextHolder.getAuthContext(), questionId, answerText);
+        saveRequest.makeRequest();
+    }, 2000); 
 
     return (
         <div className="lesson-area">
@@ -60,6 +67,7 @@ const LessonAreaComponent: React.FC<LessonDayProps> = ({ lessonDay, answersData 
                                 placeholder="Write your answer here..." 
                                 rows={4}
                                 defaultValue={getAnswerForQuestion(question.lessonDayQuestionId)}
+                                onChange={(e) => handleAnswerChange(question.lessonDayQuestionId, e.target.value)}
                             />
                             : null 
                         }
