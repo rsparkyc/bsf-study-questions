@@ -55,11 +55,14 @@ const LessonAreaComponent: React.FC<LessonDayProps> = ({ lessonDay, answersData 
                             </ul>
                         )}
                         {/* Provide Input area to answer the question */}
-                        <textarea 
-                            placeholder="Write your answer here..." 
-                            rows={4}
-                            defaultValue={getAnswerForQuestion(question.lessonDayQuestionId)}
-                        />
+                        { question.isAnswerRequired ? 
+                            <textarea 
+                                placeholder="Write your answer here..." 
+                                rows={4}
+                                defaultValue={getAnswerForQuestion(question.lessonDayQuestionId)}
+                            />
+                            : null 
+                        }
 
                     </div>
                 ))}
