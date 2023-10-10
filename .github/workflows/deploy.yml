@@ -30,4 +30,5 @@ jobs:
         AWS_REGION: us-east-1 
       run: |
         aws s3 sync build/ s3://bsfapp.ryancaskey.com/ --delete 
+        aws cloudfront create-invalidation --distribution-id E19E2SCSMK9G6R --paths "/*"
 

@@ -1,7 +1,6 @@
 import { AxiosResponse, Method } from 'axios';
 
 import AuthContext from '../../AuthContext';
-import { BsfProxiedRequest } from './BsfProxiedRequest';
 import { BsfRequest } from '../BsfRequest';
 
 export class TokenRequest extends BsfRequest<string> {
