@@ -1,7 +1,8 @@
+import { LessonDay, LessonDayQuestion } from '../api/bsf/response/AllLessonsResponse';
+
 import AllScripturesResponse from '../api/bsf/response/AllScripturesResponse';
 import AnswersResponse from '../api/bsf/response/AnswersResponse';
 import { AuthContextHolder } from '../api/bsf/AuthContext';
-import { LessonDay } from '../api/bsf/response/AllLessonsResponse';
 import React from 'react';
 import { SaveQuestionRequest } from '../api/bsf/requests/SaveQuestionRequest';
 import Scripture from './ScriptureComponent';
@@ -34,6 +35,11 @@ const LessonAreaComponent: React.FC<LessonDayProps> = ({ lessonDay, answersData,
         const saveRequest = new SaveQuestionRequest(AuthContextHolder.getAuthContext(), questionId, answerText);
         saveRequest.makeRequest();
     }, 2000); 
+
+    const questionShouldBeVisible = (question: LessonDayQuestion): boolean | undefined => {
+        return question?.isAnswerRequired ||
+            question?.lessonDayQuestionTranslations[0].questionText.startsWith("Passage Discovery");
+    }
 
     return (
         <div className="lesson-area">
@@ -86,7 +92,7 @@ const LessonAreaComponent: React.FC<LessonDayProps> = ({ lessonDay, answersData,
                             </ul>
                         )}
                         {/* Provide Input area to answer the question */}
-                        { question.isAnswerRequired ? 
+                        { questionShouldBeVisible(question) ? 
                             <textarea 
                                 placeholder="Write your answer here..." 
                                 rows={4}
