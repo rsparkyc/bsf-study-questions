@@ -19,7 +19,7 @@ export class SelfAssertedRequest extends BsfProxiedRequest<string> {
 
     protected getRequestBody(): string | null {
         return "request_type=RESPONSE&signInName=" + encodeURIComponent(this.authContext.credentials.email) +
-            "&password=" + this.authContext.credentials.password;
+            "&password=" + encodeURIComponent(this.authContext.credentials.password);
     }
 
     protected processResponse(response: AxiosResponse): void {
