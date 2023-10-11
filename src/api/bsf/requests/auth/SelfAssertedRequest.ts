@@ -18,7 +18,7 @@ export class SelfAssertedRequest extends BsfProxiedRequest<string> {
     }
 
     protected getRequestBody(): string | null {
-        return "request_type=RESPONSE&signInName=" + this.authContext.credentials.email +
+        return "request_type=RESPONSE&signInName=" + encodeURIComponent(this.authContext.credentials.email) +
             "&password=" + this.authContext.credentials.password;
     }
 
