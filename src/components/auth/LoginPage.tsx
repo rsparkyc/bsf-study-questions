@@ -28,6 +28,9 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginStateChange }) => {
 
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
+    const [isLoggingIn, setIsLoggingIn] = useState(false);
+    const [error, setError] = useState<null | string>(null);
+
 
     // Check if already logged in
     const decodeJWT = (token: string): {given_name: string, family_name: string} | null => {
@@ -50,32 +53,45 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginStateChange }) => {
     };
 
     const handleLogin = async () => {
+        setIsLoggingIn(true);
+        setError(null);
+
         // Handle API call to get the token using email and password
         const authContext = AuthContextHolder.buildOrGetAuthContext(email, password);
 
-        while (!authContext.accessToken) {
-            const configRequest = new ConfigurationRequest(authContext);
-            await configRequest.makeRequest();
+        try {
+            while (!authContext.accessToken) {
+                const configRequest = new ConfigurationRequest(authContext);
+                await configRequest.makeRequest();
+                
+                const authorizeRequest = new AuthorizeRequest(authContext);
+                await authorizeRequest.makeRequest();
+
+                const selfAssertedRequest = new SelfAssertedRequest(authContext);
+                await selfAssertedRequest.makeRequest();
+
+                const confirmedRequest = new ConfirmedRequest(authContext);
+                await confirmedRequest.makeRequest();
+
+                const tokenRequest = new TokenRequest(authContext);
+                await tokenRequest.makeRequest();
+
+                const personRequest = new PersonRequest(authContext);
+                await personRequest.makeRequest();
+            }
+
+            const newToken = authContext.accessToken;
             
-            const authorizeRequest = new AuthorizeRequest(authContext);
-            await authorizeRequest.makeRequest();
-
-            const selfAssertedRequest = new SelfAssertedRequest(authContext);
-            await selfAssertedRequest.makeRequest();
-
-            const confirmedRequest = new ConfirmedRequest(authContext);
-            await confirmedRequest.makeRequest();
-
-            const tokenRequest = new TokenRequest(authContext);
-            await tokenRequest.makeRequest();
-
-            const personRequest = new PersonRequest(authContext);
-            await personRequest.makeRequest();
+            setLoggedIn(newToken);
+        }
+        catch (err) {
+            console.error('Failed to login:', err);
+            setError('Failed to login. Please check your username and password and try again.');
+        } 
+        finally {
+            setIsLoggingIn(false);
         }
         
-        const newToken = authContext.accessToken;
-        
-        setLoggedIn(newToken);
     };
 
     const handleLogout = () => {
@@ -176,7 +192,12 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginStateChange }) => {
                 {devMode && (
                     <div className="dev-mode-panel">
                         <h3>Dev Mode</h3>
-                        <p><strong>Token:</strong> {JSON.stringify(accessToken, null, 2)}</p>
+                        <p>
+                            <strong>Token:</strong>
+                        </p>
+                        <textarea readOnly>
+                            {JSON.stringify(accessToken, null, 2)}
+                        </textarea>
                         <p><strong>Time Left:</strong> {tokenTimeLeft} seconds</p>
                         <button onClick={doTokenRefresh}>Force Token Refresh</button>
                     </div>
@@ -186,11 +207,15 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginStateChange }) => {
                     <div className="login-input-container">
                         <input className="login-input" type="text" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" />
                         <input className="login-input" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" />
-                        <button className="login-button" onClick={handleLogin}>Login</button>
+                        <button disabled={isLoggingIn} className="login-button" onClick={handleLogin}>
+                            {isLoggingIn ? 'Logging in...' : 'Login'}
+                        </button>
                         <button className="disclaimer-button" onClick={() => setIsDrawerOpen(!isDrawerOpen)}>Disclaimer</button>
                     </div>
                 )}
             </div>
+
+            {error && <div className="error-message">{error}</div>}
 
             <div className={`disclaimer-drawer ${isDrawerOpen ? 'open' : ''}`}>
                 Warning. This site is not official and is not affiliated with the <a href="https://www.bsfinternational.org/">Bible Study Fellowship</a> organization. 

@@ -8,8 +8,10 @@
     padding: 15px;
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
     transition: max-height 0.3s ease-in-out, padding 0.3s ease-in-out;
-    overflow: scroll;
     max-height: 300px;
+    max-width: 100%;
+    overflow-x: auto;
+    box-sizing: border-box;
 }
 
 .login-input-container {
@@ -90,4 +92,14 @@ button {
     min-width: 100px;
     /* Or whatever minimum makes sense */
     padding: 5px 15px;
+}
+
+.error-message {
+    color: red;
+    margin-top: 1em;
+}
+
+.dev-mode-panel > textarea {
+    width: 500px;
+    height: 200px;;
 }
