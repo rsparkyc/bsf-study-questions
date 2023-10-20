@@ -26,6 +26,8 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginStateChange }) => {
     const [devMode, setDevMode] = useState<boolean>(false);
     const [tokenTimeLeft, setTokenTimeLeft] = useState<number>(accessToken?.expires_in || 0);
 
+    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
 
     // Check if already logged in
     const decodeJWT = (token: string): {given_name: string, family_name: string} | null => {
@@ -83,7 +85,6 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginStateChange }) => {
         setAccessToken(null);
     };
 
-    // TODO: Add more JSX for input fields, buttons, token expiry monitoring, and the dev mode
     const toggleDevMode = () => {
         setDevMode(!devMode);
     };
@@ -119,10 +120,10 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginStateChange }) => {
             const authContext = AuthContextHolder.getAuthContext();
             const refreshTokenRequest = new RefreshTokenRequest(authContext);
             try {
-            await refreshTokenRequest.makeRequest();
-            if (authContext.accessToken) {
-                setLoggedIn(authContext.accessToken);
-            }
+                await refreshTokenRequest.makeRequest();
+                if (authContext.accessToken) {
+                    setLoggedIn(authContext.accessToken);
+                }
                 else {
                     console.error('No access token after refresh, logging out');
                     handleLogout();
@@ -157,32 +158,47 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginStateChange }) => {
 
 
     return (
-        <div>
-            {devMode && (
-                <div className="dev-mode-panel">
-                    <h3>Dev Mode</h3>
-                    <p><strong>Token:</strong> {JSON.stringify(accessToken, null, 2)}</p>
-                    <p><strong>Time Left:</strong> {tokenTimeLeft} seconds</p>
-                    <button onClick={doTokenRefresh}>Force Token Refresh</button>
+        
+        
+        <div className="login-container">
+            {isLoggedIn && (
+                <div className="login-header">
+                    <div>Logged in as {user}</div>
+                    <div>
+                        <button className="logout-button" onClick={handleLogout}>Logout</button>
+                        <button className="toggle-dev-button" onClick={toggleDevMode}>Toggle Dev Mode</button>
+                    </div>
                 </div>
             )}
 
-            {isLoggedIn ? (
-                <div>
-                    Logged in as {user}
-                    <button onClick={handleLogout}>Logout</button>
-                </div>
-            ) : (
-                <div>
-                    {/* Login form JSX here */}
-                    <input type="text" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" />
-                    <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" />
-                    <button onClick={handleLogin}>Login</button>
-                </div>
-            )}
-            <button onClick={toggleDevMode}>Toggle Dev Mode</button>
 
+            <div className="content-area">
+                {devMode && (
+                    <div className="dev-mode-panel">
+                        <h3>Dev Mode</h3>
+                        <p><strong>Token:</strong> {JSON.stringify(accessToken, null, 2)}</p>
+                        <p><strong>Time Left:</strong> {tokenTimeLeft} seconds</p>
+                        <button onClick={doTokenRefresh}>Force Token Refresh</button>
+                    </div>
+                )}
+
+                {!isLoggedIn && (
+                    <div className="login-input-container">
+                        <input className="login-input" type="text" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" />
+                        <input className="login-input" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" />
+                        <button className="login-button" onClick={handleLogin}>Login</button>
+                        <button className="disclaimer-button" onClick={() => setIsDrawerOpen(!isDrawerOpen)}>Disclaimer</button>
+                    </div>
+                )}
+            </div>
+
+            <div className={`disclaimer-drawer ${isDrawerOpen ? 'open' : ''}`}>
+                Warning. This site is not official and is not affiliated with the <a href="https://www.bsfinternational.org/">Bible Study Fellowship</a> organization. 
+                AWS Lambda is used as a proxy to the BSF API because of CORS issues for many requests, and thus your username and password must be proxied through. 
+                Because I take your privacy seriously, I do not log or store your username or password. If you have any conserns, please refain from using this site.
+            </div>
         </div>
+
     );
 };
 

@@ -1,3 +1,7 @@
+* {
+    box-sizing: border-box;
+}
+
 .dev-mode-panel {
     width: 100%;
     background: rgba(255, 255, 255, 0.9);
@@ -6,5 +10,84 @@
     transition: max-height 0.3s ease-in-out, padding 0.3s ease-in-out;
     overflow: scroll;
     max-height: 300px;
-    /* or whatever your max content height should be */
+}
+
+.login-input-container {
+    max-width: 400px;
+}
+
+.login-input {
+    width: 100%;
+    padding: 20px;
+    margin: 10px;
+    font-size: 1.2rem;
+}
+
+.login-button,
+.disclaimer-button {
+    width: 100%;
+    padding: 15px;
+    margin: 10px;
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+.disclaimer-drawer {
+    width: 100%;
+    height: 0;
+    overflow: hidden;
+    background-color: rgba(255, 255, 255, 0.9);
+    transition: height 0.3s ease-in-out;
+}
+
+.disclaimer-drawer.open {
+    height: auto;
+}
+
+.login-header {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+    margin-bottom: 20px;
+}
+
+.login-header div:first-child {
+    flex-grow: 1;
+}
+
+.logout-button,
+.toggle-dev-button {
+    margin-left: 10px;
+    font-size: small;
+}
+
+.content-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* Centers child elements */
+    justify-content: center;
+    /* This could be optional */
+    height: auto;
+    /* Full viewport height */
+    width: 100%;
+    /* Takes up full container width */
+}
+
+button {
+    min-width: 100px;
+    /* Or whatever minimum makes sense */
+    padding: 5px 15px;
 }
