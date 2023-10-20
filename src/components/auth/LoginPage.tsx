@@ -118,9 +118,19 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginStateChange }) => {
         if (AuthContextHolder.hasAuthContext()) {
             const authContext = AuthContextHolder.getAuthContext();
             const refreshTokenRequest = new RefreshTokenRequest(authContext);
+            try {
             await refreshTokenRequest.makeRequest();
             if (authContext.accessToken) {
                 setLoggedIn(authContext.accessToken);
+            }
+                else {
+                    console.error('No access token after refresh, logging out');
+                    handleLogout();
+                }
+            }
+            catch(err) {
+                console.error('Failed to refresh token, logging out', err);
+                handleLogout();
             }
         }
     }, [setLoggedIn]);
