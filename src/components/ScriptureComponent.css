@@ -1,6 +1,7 @@
 /* ScriptureComponent.css */
 
 .expanded-scripture {
+    max-width: 700px;
     width: calc(100% - 20px);
     border: 1px solid #e0e0e0;
     border-radius: 5px;
