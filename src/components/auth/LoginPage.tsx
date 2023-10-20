@@ -94,12 +94,12 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginStateChange }) => {
         
     };
 
-    const handleLogout = () => {
+    const handleLogout = useCallback(() => {
         localStorage.removeItem('accessToken');
         onLoginStateChange(false);
         setIsLoggedIn(false);
         setAccessToken(null);
-    };
+    }, [onLoginStateChange, setIsLoggedIn, setAccessToken]);
 
     const toggleDevMode = () => {
         setDevMode(!devMode);
@@ -150,7 +150,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginStateChange }) => {
                 handleLogout();
             }
         }
-    }, [setLoggedIn]);
+    }, [setLoggedIn, handleLogout]);
 
     const calculateTokenTimeLeft = useCallback(() => {
         if (accessToken) {
