@@ -1,6 +1,6 @@
 import './LessonContainerComponent.css';
 
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 
 import { AllLessonsRequest } from '../api/bsf/requests/AllLessonsRequest';
 import AllLessonsResponse from '../api/bsf/response/AllLessonsResponse';
@@ -12,6 +12,7 @@ import { AuthContextHolder } from '../api/bsf/AuthContext';
 import Breadcrumbs from './Breadcrumbs';
 import LeftNav from './LeftNav';
 import LessonAreaComponent from './LessonAreaComponent';
+import SettingsContext from '../context/SettingsContext';
 
 const LessonContainer: React.FC = () => {
 
@@ -26,6 +27,7 @@ const LessonContainer: React.FC = () => {
   const savedLessonId = Number(localStorage.getItem('currentLessonId') || '0');
   const savedLessonDayId = Number(localStorage.getItem('currentLessonDayId') || '0');
 
+  const settings = useContext(SettingsContext);
   
   useEffect(() => {
       // Fetch your API data here and set it to the state
@@ -72,21 +74,40 @@ const LessonContainer: React.FC = () => {
           initialExpandedStudyId={Number(savedStudyId)}
           initialExpandedLessonId={Number(savedLessonId)}
           initialSelectedLessonDayId={Number(savedLessonDayId)}
-       />
+        />
 
-        {currentLessonDayId && lessonData && (
-            <LessonAreaComponent 
-                lessonDay={lessonData.data.studies
-                    .flatMap(study => study.lessons)
-                    .flatMap(lesson => lesson.lessonDays)
-                    .find(day => day.lessonDayId === currentLessonDayId)}
-                answersData={answersData}
-                scripturesData={scripturesData}
-            />
-        )}
+        <div className='lesson-area-v'>
+          {currentLessonDayId && lessonData && (
+            settings.settings.fullLessonMode 
+              ? (() => {
+                  const currentStudy = lessonData.data.studies.find(study => study.lessons.some(lesson => lesson.lessonDays.some(day => day.lessonDayId === currentLessonDayId)));
+                  const currentLesson = currentStudy?.lessons.find(lesson => lesson.lessonDays.some(day => day.lessonDayId === currentLessonDayId));
+
+                  return currentLesson?.lessonDays.map(day => (
+                    <div key={day.lessonDayId}>
+                      <LessonAreaComponent 
+                        key={day.lessonDayId}
+                        lessonDay={day}
+                        answersData={answersData}
+                        scripturesData={scripturesData}
+                      />
+                    </div>
+                  ));
+                })()
+              : <LessonAreaComponent 
+                  lessonDay={lessonData.data.studies
+                      .flatMap(study => study.lessons)
+                      .flatMap(lesson => lesson.lessonDays)
+                      .find(day => day.lessonDayId === currentLessonDayId)}
+                  answersData={answersData}
+                  scripturesData={scripturesData}
+                />
+          )}
+        </div> 
       </div>
     </div>
   );
+
 };
 
 export default LessonContainer;

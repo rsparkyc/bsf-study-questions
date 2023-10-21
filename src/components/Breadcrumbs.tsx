@@ -1,5 +1,7 @@
+import React, { useContext } from 'react';
+
 import AllLessonsResponse from '../api/bsf/response/AllLessonsResponse';
-import React from 'react';
+import SettingsContext from '../context/SettingsContext';
 
 interface BreadcrumbsProps {
     studyId?: number;
@@ -14,8 +16,10 @@ interface BreadcrumbsProps {
 }
 
 const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ studyId, lessonId, lessonDayId, data, setData }) => {
-    if (!data)  {
-        return <div>Loading Study Information...</div>;
+    const settings = useContext(SettingsContext);
+
+    if (!data) {
+        return <div></div>;
     }
 
     const study = data.data.studies.find(study => study.studyId === studyId);
@@ -55,11 +59,12 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ studyId, lessonId, lessonDayI
                             setData.setCurrentLessonDayId(undefined);
                         }}>
                         {lesson.title}
-                    </button> &gt;
+                    </button> 
+                    {!settings.settings.fullLessonMode && ('>')}
                 </>
             )}
 
-            {lessonDay && (
+            {lessonDay && !settings.settings.fullLessonMode && (
                 <button className="href-button">
                     Day {lessonDay.dayOfWeek}
                 </button>

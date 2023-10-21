@@ -30,10 +30,6 @@ const LeftNav: React.FC<LeftNavProps> = ({
 
     const settings = useContext(SettingsContext);
 
-    useEffect(() => {
-        console.log('Settings have changed!');
-    }, [settings]);
-    
     if (!data)  {
         return <div>Loading Study Information...</div>;
     }
@@ -52,6 +48,14 @@ const LeftNav: React.FC<LeftNavProps> = ({
         );
         localStorage.setItem('currentLessonId', lessonId.toString());
         setCurrentLessonId(lessonId);
+        // If we're in fullLessonMode, then select the first day of the lesson
+        if (settings.settings.fullLessonMode) {
+            const lesson = data.data.studies.flatMap(study => study.lessons).find(lesson => lesson.lessonId === lessonId);
+            if (lesson) {
+                const firstDay = lesson.lessonDays[0];
+                toggleLessonDay(firstDay.lessonDayId);
+            }
+        }
     };
 
     const toggleLessonDay = (lessonDayId: number) => {
@@ -73,14 +77,14 @@ const LeftNav: React.FC<LeftNavProps> = ({
                         {study.displayName}
                     </button>
                     {expandedStudyId === study.studyId && study.lessons.map((lesson: Lesson) => (
-                        <div key={lesson.lessonId} className={'lesson-nav expandable-nav' + (expandedLessonId === lesson.lessonId ? ' selected-nav' : '')}>
+                        <div key={lesson.lessonId} className={'lesson-nav' + (settings.settings.fullLessonMode ? '': ' expandable-nav') + (expandedLessonId === lesson.lessonId ? ' selected-nav' : '')}>
                             <button 
                                 className="href-button"
                                 aria-expanded={expandedLessonId === lesson.lessonId}
                                 onClick={() => toggleLesson(lesson.lessonId)}>
                                 {lesson.title}
                             </button>
-                            {expandedLessonId === lesson.lessonId && lesson.lessonDays.map((day) => (
+                            {!settings.settings.fullLessonMode && expandedLessonId === lesson.lessonId && lesson.lessonDays.map((day) => (
                                 <div key={day.lessonDayId} className={'day-nav' + (selectedLessonDayId === day.lessonDayId ? ' selected-nav' : '') }>
                                     <button 
                                         className="href-button"

@@ -27,3 +27,8 @@
 .content-row {
     display: flex;
 }
+
+.lesson-area-v {
+    display: flex;
+    flex-direction: column;
+}
