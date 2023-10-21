@@ -1,7 +1,7 @@
 import './LeftNav.css';
 
 import AllLessonsResponse, { Lesson, Study } from '../api/bsf/response/AllLessonsResponse';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 
 import SettingsContext from '../context/SettingsContext';
 
