@@ -37,8 +37,11 @@ const LessonAreaComponent: React.FC<LessonDayProps> = ({ lessonDay, answersData,
     }, 2000); 
 
     const questionShouldBeVisible = (question: LessonDayQuestion): boolean | undefined => {
-        return question?.isAnswerRequired ||
-            question?.lessonDayQuestionTranslations[0].questionText.startsWith("Passage Discovery");
+        return question?.isAnswerRequired || isPassageDiscovery(question);
+    }
+
+    const isPassageDiscovery = (question: LessonDayQuestion): boolean => {
+        return question?.lessonDayQuestionTranslations[0].questionText.startsWith("Passage Discovery");
     }
 
     return (
@@ -95,6 +98,7 @@ const LessonAreaComponent: React.FC<LessonDayProps> = ({ lessonDay, answersData,
                         { questionShouldBeVisible(question) ? 
                             <textarea 
                                 placeholder="Write your answer here..." 
+                                className={isPassageDiscovery(question) ? "passage-discovery-question" : "standard-question"}
                                 rows={4}
                                 defaultValue={getAnswerForQuestion(question.lessonDayQuestionId)}
                                 onChange={(e) => handleAnswerChange(question.lessonDayQuestionId, e.target.value)}

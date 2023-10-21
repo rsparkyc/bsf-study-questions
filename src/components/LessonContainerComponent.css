@@ -17,6 +17,11 @@
 .lesson-area textarea {
     max-width: 800px;
     width: calc(100% - 10px);
+    height: 80px;
+}
+
+.lesson-area textarea.passage-discovery-question {
+    height: 400px;
 }
 
 
