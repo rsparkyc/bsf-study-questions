@@ -49,6 +49,7 @@
 .login-header {
     display: flex;
     justify-content: flex-start;
+    flex-direction: row;
     align-items: center;
     width: 100%;
     padding: 10px;
@@ -102,4 +103,15 @@ button {
 .dev-mode-panel > textarea {
     width: 500px;
     height: 200px;;
+}
+
+.button-and-settings-container {
+    display: flex;
+    /* This makes it a flex container */
+    align-items: center;
+    /* This will vertically center the items in the flex container */
+}
+
+.login-header>div {
+    display: inline-flex;
 }

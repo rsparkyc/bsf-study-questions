@@ -71,6 +71,7 @@ const LessonContainer: React.FC = () => {
           setCurrentLessonDayId={setCurrentLessonDayId}
           initialExpandedStudyId={Number(savedStudyId)}
           initialExpandedLessonId={Number(savedLessonId)}
+          initialSelectedLessonDayId={Number(savedLessonDayId)}
        />
 
         {currentLessonDayId && lessonData && (

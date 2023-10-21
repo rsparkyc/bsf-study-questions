@@ -1,0 +1,26 @@
+.settings-icon {
+    cursor: pointer;
+    padding-left: 10px;
+}
+
+.settings-menu {
+    position: absolute;
+    top: 50px;
+    /* Adjust as needed */
+    right: 0;
+    width: 300px;
+    /* or max-width for responsiveness */
+    background: white;
+    z-index: 9999;
+    /* High z-index to overlay other elements */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 767px) {
+    .settings-menu {
+        width: 100vw;
+        height: 100vh;
+        top: 0;
+        left: 0;
+    }
+}

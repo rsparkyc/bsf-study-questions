@@ -58,12 +58,16 @@
     padding-left: 5px;
 }
 
+.left-nav .selected-nav > button {
+    background-color: #fcaf17;
+}
+
 .left-nav button.href-button:hover:before {
     color: #0056B3;
 }
 
 /* Default triangle pointing right */
-.left-nav button.href-button:before {
+.left-nav .expandable-nav > button.href-button:before {
     content: '\25BA';
     display: inline-block;
     margin-right: 10px;
@@ -71,6 +75,11 @@
 }
 
 /* For expanded studies */
-.left-nav button.href-button[aria-expanded='true']:before {
+.left-nav .expandable-nav > button.href-button[aria-expanded='true']:before {
     transform: rotate(90deg); /* Point downwards when expanded */
+}
+
+.left-nav .lesson-nav,
+.left-nav .day-nav {
+    margin-left: 10px;
 }

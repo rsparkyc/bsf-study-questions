@@ -9,6 +9,7 @@ import { ConfirmedRequest } from '../../api/bsf/requests/auth/ConfirmedRequest';
 import { PersonRequest } from '../../api/bsf/requests/PersonRequest';
 import { RefreshTokenRequest } from '../../api/bsf/requests/auth/RefreshTokenRequest';
 import { SelfAssertedRequest } from '../../api/bsf/requests/auth/SelfAssertedRequest';
+import SettingsComponent from '../SettingsComponent';
 import { TokenRequest } from '../../api/bsf/requests/auth/TokenRequest';
 
 interface LoginPageProps {
@@ -174,19 +175,17 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginStateChange }) => {
 
 
     return (
-        
-        
         <div className="login-container">
             {isLoggedIn && (
                 <div className="login-header">
                     <div>Logged in as {user}</div>
-                    <div>
+                    <div className="buttons-and-settings-container">
                         <button className="logout-button" onClick={handleLogout}>Logout</button>
                         <button className="toggle-dev-button" onClick={toggleDevMode}>Toggle Dev Mode</button>
-                    </div>
+                        <SettingsComponent />
+                    </div> 
                 </div>
             )}
-
 
             <div className="content-area">
                 {devMode && (
@@ -223,7 +222,6 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginStateChange }) => {
                 Because I take your privacy seriously, I do not log or store your username or password. If you have any conserns, please refain from using this site.
             </div>
         </div>
-
     );
 };
 

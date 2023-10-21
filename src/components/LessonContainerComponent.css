@@ -7,23 +7,22 @@
     width: 100px;
 }
 
-/* add a class to the main content container in LessonAreaComponent for better styling */
 .lesson-area {
-    /* takes the remaining width */
     flex-grow: 1;
-    padding-left: 10px; /* optional: for some spacing between the nav and content */
+    padding-left: 10px;
+    max-width: 800px;
+    width: calc(100% - 10px);
+    padding-right: 10px;
 }
 
 .lesson-area textarea {
-    max-width: 800px;
-    width: calc(100% - 10px);
+    width: 100%;
     height: 80px;
 }
 
 .lesson-area textarea.passage-discovery-question {
     height: 400px;
 }
-
 
 .content-row {
     display: flex;
