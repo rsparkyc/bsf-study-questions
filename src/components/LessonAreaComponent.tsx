@@ -6,6 +6,7 @@ import { AuthContextHolder } from '../api/bsf/AuthContext';
 import React from 'react';
 import { SaveQuestionRequest } from '../api/bsf/requests/SaveQuestionRequest';
 import Scripture from './ScriptureComponent';
+import { TypeaheadTextarea } from './TypeaheadTextarea';
 import debounce from 'lodash.debounce';
 
 interface LessonDayProps {
@@ -43,6 +44,15 @@ const LessonAreaComponent: React.FC<LessonDayProps> = ({ lessonDay, answersData,
     const isPassageDiscovery = (question: LessonDayQuestion): boolean => {
         return question?.lessonDayQuestionTranslations[0].questionText.startsWith("Passage Discovery");
     }
+
+    const suggestions = [
+        "apple pie is delicious",
+        "banana bread is my favorite",
+        "cherry blossoms are beautiful",
+        "dates are sweet",
+        "elderberry syrup is beneficial"
+    ];
+
 
     return (
         <div className="lesson-area">
@@ -96,14 +106,14 @@ const LessonAreaComponent: React.FC<LessonDayProps> = ({ lessonDay, answersData,
                         )}
                         {/* Provide Input area to answer the question */}
                         { questionShouldBeVisible(question) ? 
-                            <textarea 
-                                placeholder="Write your answer here..." 
-                                className={isPassageDiscovery(question) ? "passage-discovery-question" : "standard-question"}
-                                rows={4}
-                                defaultValue={getAnswerForQuestion(question.lessonDayQuestionId)}
-                                onChange={(e) => handleAnswerChange(question.lessonDayQuestionId, e.target.value)}
-                            />
-                            : null 
+                        <TypeaheadTextarea 
+                            suggestions={suggestions} 
+                            rows={4} 
+                            additionalClassNames={isPassageDiscovery(question) ? "passage-discovery-question" : "standard-question"}
+                            placeholder='Write your answer here...'
+                            defaultValue = {getAnswerForQuestion(question.lessonDayQuestionId)}
+                            onChange={(text) => handleAnswerChange(question.lessonDayQuestionId, text)}
+                        /> : null 
                         }
 
                     </div>
