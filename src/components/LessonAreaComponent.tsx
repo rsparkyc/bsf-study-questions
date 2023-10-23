@@ -45,13 +45,17 @@ const LessonAreaComponent: React.FC<LessonDayProps> = ({ lessonDay, answersData,
         return question?.lessonDayQuestionTranslations[0].questionText.startsWith("Passage Discovery");
     }
 
-    const suggestions = [
-        "apple pie is delicious",
-        "banana bread is my favorite",
-        "cherry blossoms are beautiful",
-        "dates are sweet",
-        "elderberry syrup is beneficial"
+  const generateSuggestions = async (input: string) => {
+    // Mock API call, replace with your actual API call logic
+    const mockData = [
+      "apple pie is delicious",
+      "banana bread is my favorite",
+      "cherry blossoms are beautiful",
+      "dates are sweet",
+      "elderberry syrup is beneficial"
     ];
+    return mockData.filter(item => item.includes(input));
+  };
 
 
     return (
@@ -107,7 +111,8 @@ const LessonAreaComponent: React.FC<LessonDayProps> = ({ lessonDay, answersData,
                         {/* Provide Input area to answer the question */}
                         { questionShouldBeVisible(question) ? 
                         <TypeaheadTextarea 
-                            suggestions={suggestions} 
+                            generateSuggestions={generateSuggestions} 
+                            suggestionsDebounceTime={250}
                             rows={4} 
                             additionalClassNames={isPassageDiscovery(question) ? "passage-discovery-question" : "standard-question"}
                             placeholder='Write your answer here...'

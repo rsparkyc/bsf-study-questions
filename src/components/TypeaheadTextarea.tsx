@@ -2,8 +2,11 @@ import './TypeaheadTextarea.css';
 
 import React, { useState } from 'react';
 
+import debounce from 'lodash.debounce';
+
 type Props = {
-  suggestions: string[];
+  generateSuggestions: (input: string) => Promise<string[]>;
+  suggestionsDebounceTime?: number;
   additionalClassNames?: string;
   rows?: number;
   columns?: number;
@@ -12,20 +15,39 @@ type Props = {
   onChange?: (value: string) => void;
 };
 
-export const TypeaheadTextarea: React.FC<Props> = ({ suggestions, additionalClassNames, rows, columns, placeholder, defaultValue, onChange}) => {
+export const TypeaheadTextarea: React.FC<Props> = ({ generateSuggestions, suggestionsDebounceTime, additionalClassNames, rows, columns, placeholder, defaultValue, onChange}) => {
   const [inputValue, setInputValue] = useState<string>("");
   const [ghostValue, setGhostValue] = useState<string>("");
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const val = event.target.value;
-    setInputValue(val);
-    if (val === "") {
+  const debounceTime = suggestionsDebounceTime || 0;
+  const fetchSuggestions = debounce(async (input: string) => {
+    if (input === "") {
       setGhostValue("");
     }
     else {
-      const match = suggestions.find(s => s.startsWith(val));
+      const suggestions = await generateSuggestions(input);
+      const match = suggestions.find(s => s.startsWith(input));
       setGhostValue(match || "");
     }
+  }, debounceTime); 
+
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const val = event.target.value;
+    console.log("handleInputChange: " + val);
+    
+    // Check if the user is continuing to type the suggestion
+    if (ghostValue.startsWith(val) && val !== "") {
+      setInputValue(val);
+      // No need to do anything else, just let them continue typing
+    } else {
+      setInputValue(val);
+      setGhostValue("");  // Clear the ghost input quickly
+
+      // Fetch suggestions using the debounced function
+      fetchSuggestions(val);
+    }
+
     if (onChange) {
       onChange(val);
     }
@@ -36,14 +58,12 @@ export const TypeaheadTextarea: React.FC<Props> = ({ suggestions, additionalClas
       event.preventDefault();
       setInputValue(ghostValue);
       setGhostValue("");
+      if (onChange) {
+        onChange(ghostValue);
+      }
     }
   };
 
-  const handleOnBlur = (event: React.FocusEvent<HTMLTextAreaElement>) => {
-    if (onChange) {
-      onChange(event.target.value);
-    } 
-  }
 
   return (
     <div className="textarea-wrapper">
@@ -51,7 +71,6 @@ export const TypeaheadTextarea: React.FC<Props> = ({ suggestions, additionalClas
         value={inputValue}
         onChange={handleInputChange}
         onKeyDown={handleKeyDown}
-        onBlur={handleOnBlur}
         className={"typeahead-input" + (additionalClassNames ? " " + additionalClassNames : "")}
         rows={rows}
         {...(columns ? { cols: columns } : {})}
