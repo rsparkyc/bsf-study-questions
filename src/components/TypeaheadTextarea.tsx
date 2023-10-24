@@ -1,11 +1,12 @@
 import './TypeaheadTextarea.css';
 
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 
 import debounce from 'lodash.debounce';
 
 type Props = {
-  generateSuggestions: (input: string) => Promise<string[]>;
+  generateSuggestions: (input: string, context: any) => Promise<string[]>;
+  suggestionsContext: any;
   suggestionsDebounceTime?: number;
   additionalClassNames?: string;
   rows?: number;
@@ -15,26 +16,52 @@ type Props = {
   onChange?: (value: string) => void;
 };
 
-export const TypeaheadTextarea: React.FC<Props> = ({ generateSuggestions, suggestionsDebounceTime, additionalClassNames, rows, columns, placeholder, defaultValue, onChange}) => {
-  const [inputValue, setInputValue] = useState<string>("");
+export const TypeaheadTextarea: React.FC<Props> = ({ 
+    generateSuggestions,
+    suggestionsContext,
+    suggestionsDebounceTime,
+    additionalClassNames,
+    rows,
+    columns,
+    placeholder,
+    defaultValue,
+    onChange}) => {
+  const [inputValue, setInputValue] = useState<string>(defaultValue || "");
   const [ghostValue, setGhostValue] = useState<string>("");
 
   const debounceTime = suggestionsDebounceTime || 0;
-  const fetchSuggestions = debounce(async (input: string) => {
+
+  const mainTextareaRef = React.useRef<HTMLTextAreaElement>(null);
+  const ghostTextareaRef = React.useRef<HTMLTextAreaElement>(null);
+
+  const handleScroll = (event: React.UIEvent<HTMLTextAreaElement>) => {
+    if (ghostTextareaRef.current) {
+      ghostTextareaRef.current.scrollTop = event.currentTarget.scrollTop;
+    }
+  };
+
+  // Watch for changes in ghostValue
+  React.useEffect(() => {
+    if (mainTextareaRef.current && ghostTextareaRef.current) {
+      ghostTextareaRef.current.scrollTop = mainTextareaRef.current.scrollTop;
+    }
+  }, [ghostValue]); // Only re-run the effect if ghostValue changes
+
+
+  const fetchSuggestions = useCallback(debounce(async (input: string) => {
     if (input === "") {
       setGhostValue("");
     }
     else {
-      const suggestions = await generateSuggestions(input);
+      const suggestions = await generateSuggestions(input, suggestionsContext);
       const match = suggestions.find(s => s.startsWith(input));
       setGhostValue(match || "");
     }
-  }, debounceTime); 
+  }, debounceTime), [generateSuggestions, suggestionsContext]);
 
 
   const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     const val = event.target.value;
-    console.log("handleInputChange: " + val);
     
     // Check if the user is continuing to type the suggestion
     if (ghostValue.startsWith(val) && val !== "") {
@@ -64,21 +91,47 @@ export const TypeaheadTextarea: React.FC<Props> = ({ generateSuggestions, sugges
     }
   };
 
+  const resizeObserverRef = React.useRef<ResizeObserver | null>(null);
+    React.useEffect(() => {
+    if (mainTextareaRef.current && ghostTextareaRef.current) {
+      // Initialize the ResizeObserver
+      resizeObserverRef.current = new ResizeObserver(() => {
+        const mainTextareaStyle = window.getComputedStyle(mainTextareaRef.current!);
+        if (ghostTextareaRef.current?.style) {
+          ghostTextareaRef.current.style.width = mainTextareaStyle.width;
+          ghostTextareaRef.current.style.height = mainTextareaStyle.height;
+        }
+      });
+
+      // Start observing the main textarea
+      resizeObserverRef.current.observe(mainTextareaRef.current);
+
+      // Cleanup
+      return () => {
+        if (resizeObserverRef.current) {
+          resizeObserverRef.current.disconnect();
+        }
+      };
+    }
+  }, []);
+
+
 
   return (
     <div className="textarea-wrapper">
       <textarea
+        ref={mainTextareaRef}
         value={inputValue}
         onChange={handleInputChange}
         onKeyDown={handleKeyDown}
         className={"typeahead-input" + (additionalClassNames ? " " + additionalClassNames : "")}
         rows={rows}
+        onScroll={handleScroll} // Attach the scroll event handler
         {...(columns ? { cols: columns } : {})}
         {...(placeholder ? { placeholder: placeholder } : {})}
-        {...(defaultValue ? { defaultValue: defaultValue } : {})}
-
       />
       <textarea
+        ref={ghostTextareaRef}
         value={ghostValue}
         disabled
         className={"typeahead-ghost" + (additionalClassNames ? " " + additionalClassNames : "")}

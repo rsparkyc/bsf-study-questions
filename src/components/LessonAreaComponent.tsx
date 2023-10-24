@@ -1,3 +1,4 @@
+import { ConversationConfig, Message, OpenAiCompletionRequest, Role } from '../api/openAi/OpenAiCompletionRequest';
 import { LessonDay, LessonDayQuestion } from '../api/bsf/response/AllLessonsResponse';
 
 import AllScripturesResponse from '../api/bsf/response/AllScripturesResponse';
@@ -45,17 +46,98 @@ const LessonAreaComponent: React.FC<LessonDayProps> = ({ lessonDay, answersData,
         return question?.lessonDayQuestionTranslations[0].questionText.startsWith("Passage Discovery");
     }
 
-  const generateSuggestions = async (input: string) => {
-    // Mock API call, replace with your actual API call logic
-    const mockData = [
-      "apple pie is delicious",
-      "banana bread is my favorite",
-      "cherry blossoms are beautiful",
-      "dates are sweet",
-      "elderberry syrup is beneficial"
-    ];
-    return mockData.filter(item => item.includes(input));
-  };
+    // this will build the verses context for the question, starting with the Scripture for the day,
+    // then adding any additional scriptures for the question
+    const extractPlaintextScriptureDataForLesson = (lessonDay: LessonDay, scripturesData: AllScripturesResponse | undefined, suggestionsContext: LessonDayQuestion): string[] => {
+        const dailyScriptures = lessonDay?.lessonDayScriptures;
+        const dailyScripturesData = dailyScriptures.map(ds => scripturesData?.data.find(s => s.scriptureId === ds.scriptureId));
+        const questionScriptures = suggestionsContext.lessonDayQuestionScriptures;
+        const questionScriptureData = questionScriptures.map(qs => scripturesData?.data.find(s => s.scriptureId === qs.scriptureId));
+        const allScripturesData = dailyScripturesData.concat(questionScriptureData);
+        const allScriptures = dailyScriptures.concat(questionScriptures);
+
+
+        return allScripturesData.map((scripture, index) => {
+            const htmlVersion = scripture?.htmlContent;
+            // remove the first and last character (since they're just quotes) from the htmlVersion
+            const strippedHtmlVersion = htmlVersion?.slice(1, -1).replaceAll('\\"', '"');
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(strippedHtmlVersion || "", "text/html");
+
+            const spansWithDataCaller = doc.querySelectorAll('span[data-caller]');
+            spansWithDataCaller.forEach(span => {
+                span.parentNode?.removeChild(span);
+            });
+
+            const spansWithDataNumber = doc.querySelectorAll('span[data-number]');
+            spansWithDataNumber.forEach(span => {
+                const dataNumberValue = span.getAttribute('data-number');
+                const textNode = doc.createTextNode(" " + (dataNumberValue || "") + ": ");
+                span.parentNode?.replaceChild(textNode, span);
+            });
+
+            const currentScriptureReferenceData = allScriptures[index];
+            return scripture?.longName + " " + currentScriptureReferenceData.scripture.chapterVerses + " - " + doc.body.textContent || "";
+        });
+    }
+
+    const buildConversationConfig = (scriptures: string[], questionText: string, exitsingAnswer: string): ConversationConfig => {
+        return {
+            messages: [ 
+                {
+                    role: "system",
+                    content: "These are the laws by which you live by: \n" + 
+                        "1) You are a text completion bot that helps with bible studies. \n" + 
+                        "2) You will expect verses the user is referencing, as well as the question they're answering, and the text they've written. \n" +
+                        "3) You will attempt to complete their sentence using context from the verses. \n" +
+                        "4) You will only respond with the text completion, and not include the part of the sentence the user has already written. \n" +
+                        "5) If you've found that you've included the user's text, you will remove it."
+                },
+                {
+                    role: "user",
+                    content: "Here are the verses I've read: \n" + scriptures.join("\n") + "\n\n" +
+                        "I am answering the following question: \n" + questionText + "\n\n" +
+                        "So far, I've written: \n" + exitsingAnswer
+                }
+
+            ],
+            max_tokens: 25,
+            n: 1,
+            stop: [
+                "\n",
+                "."
+            ],
+            model: "gpt-3.5-turbo"
+        };
+    }
+
+
+    const generateSuggestions = async (input: string, suggestionsContext: LessonDayQuestion) => {
+
+        console.log("generateSuggestions called with input: " + input);
+
+        const plaintextScriptures = extractPlaintextScriptureDataForLesson(lessonDay, scripturesData, suggestionsContext);
+        // find the actual question text being asked for the question
+        const questionText = suggestionsContext.lessonDayQuestionTranslations[0].questionText;
+
+        //let's build the conversation config:
+        const conversationConfig = buildConversationConfig(plaintextScriptures, questionText, input);
+
+        const openAiRequest = new OpenAiCompletionRequest();
+        const openAiResponse = await openAiRequest.makeRequest(conversationConfig);
+       
+        // iterate through the choices -> message -> content, prepend the input, and return as an array
+        return openAiResponse.choices.map(choice => choice.message.content).map(text => 
+            {
+                if (!text.startsWith(input)) {
+                    if (!input.endsWith(" ") && !text.startsWith(" ")) { 
+                        return input + " " + text;
+                    }
+                    return input + text ;
+                }
+                return text;
+            });
+    };
 
 
     return (
@@ -112,7 +194,8 @@ const LessonAreaComponent: React.FC<LessonDayProps> = ({ lessonDay, answersData,
                         { questionShouldBeVisible(question) ? 
                         <TypeaheadTextarea 
                             generateSuggestions={generateSuggestions} 
-                            suggestionsDebounceTime={250}
+                            suggestionsContext={question}
+                            suggestionsDebounceTime={500}
                             rows={4} 
                             additionalClassNames={isPassageDiscovery(question) ? "passage-discovery-question" : "standard-question"}
                             placeholder='Write your answer here...'

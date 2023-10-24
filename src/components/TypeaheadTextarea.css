@@ -10,9 +10,9 @@
     border: 1px solid #ccc;
     padding: 8px;
     outline: none;
-    resize: none;
     overflow: hidden;
     box-sizing: border-box;
+    resize: both;
     /* Ensures padding and border are included in width/height */
     grid-area: 1 / 1;
     /* This ensures both textareas are placed in the same grid cell */
