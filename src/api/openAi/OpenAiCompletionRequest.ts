@@ -9,30 +9,30 @@ type MyAxiosRequestConfig = {
 
 export class OpenAiCompletionRequest {
 
-    private getRequestOptions(requset: ConversationConfig):MyAxiosRequestConfig {
-        const headers = this.getHeaders();
+    private getRequestOptions(request: ConversationConfig, accessToken: string):MyAxiosRequestConfig {
+        const headers = this.getHeaders(accessToken);
 
         const requestOptions = {
             url: this.generateUrl(),
             method: this.getRequestMethod(),
             headers,
-            data: JSON.stringify(requset)
+            data: JSON.stringify(request)
         };
         
         return requestOptions;
     }
 
-    public async makeRequest(request: ConversationConfig): Promise<ChatCompletion> {
-        const requestOptions = this.getRequestOptions(request);
+    public async makeRequest(request: ConversationConfig, accessToken: string): Promise<ChatCompletion> {
+        const requestOptions = this.getRequestOptions(request, accessToken);
 
         const response: AxiosResponse<ChatCompletion> = await axios(requestOptions);
 
         return response.data;
     }
 
-    private getHeaders(): Record<string, string> {
+    private getHeaders(accessToken: string): Record<string, string> {
         const headers: Record<string, string> = {};
-        headers['Authorization'] = `Bearer ${this.openAiAccessToken}`;
+        headers['Authorization'] = `Bearer ${accessToken}`;
         headers['Content-Type'] = 'application/json';
         return headers;
     }

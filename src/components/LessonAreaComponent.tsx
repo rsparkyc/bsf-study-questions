@@ -1,12 +1,13 @@
-import { ConversationConfig, Message, OpenAiCompletionRequest, Role } from '../api/openAi/OpenAiCompletionRequest';
+import { ConversationConfig, OpenAiCompletionRequest } from '../api/openAi/OpenAiCompletionRequest';
 import { LessonDay, LessonDayQuestion } from '../api/bsf/response/AllLessonsResponse';
+import React, { useContext } from 'react';
 
 import AllScripturesResponse from '../api/bsf/response/AllScripturesResponse';
 import AnswersResponse from '../api/bsf/response/AnswersResponse';
 import { AuthContextHolder } from '../api/bsf/AuthContext';
-import React from 'react';
 import { SaveQuestionRequest } from '../api/bsf/requests/SaveQuestionRequest';
 import Scripture from './ScriptureComponent';
+import SettingsContext from '../context/SettingsContext';
 import { TypeaheadTextarea } from './TypeaheadTextarea';
 import debounce from 'lodash.debounce';
 
@@ -16,8 +17,10 @@ interface LessonDayProps {
     scripturesData: AllScripturesResponse | undefined;
 }
 
-
 const LessonAreaComponent: React.FC<LessonDayProps> = ({ lessonDay, answersData, scripturesData }) => {
+
+    const settings = useContext(SettingsContext);
+
     if (!lessonDay) {
         return <div>Loading Lesson Day Information...</div>;
     }
@@ -113,6 +116,14 @@ const LessonAreaComponent: React.FC<LessonDayProps> = ({ lessonDay, answersData,
 
 
     const generateSuggestions = async (input: string, suggestionsContext: LessonDayQuestion) => {
+        if (settings.settings.typeaheadSuggestions === false) {
+            // if typeahead suggestions are disabled, return an empty array
+            return [];
+        }
+        if (settings.settings.typeaheadApiKey === "") {
+            console.warn("OpenAI API Key is not set, typeahead suggestions will not work");
+            return [];
+        }
 
         console.log("generateSuggestions called with input: " + input);
 
@@ -124,7 +135,7 @@ const LessonAreaComponent: React.FC<LessonDayProps> = ({ lessonDay, answersData,
         const conversationConfig = buildConversationConfig(plaintextScriptures, questionText, input);
 
         const openAiRequest = new OpenAiCompletionRequest();
-        const openAiResponse = await openAiRequest.makeRequest(conversationConfig);
+        const openAiResponse = await openAiRequest.makeRequest(conversationConfig, settings.settings.typeaheadApiKey);
        
         // iterate through the choices -> message -> content, prepend the input, and return as an array
         return openAiResponse.choices.map(choice => choice.message.content).map(text => 

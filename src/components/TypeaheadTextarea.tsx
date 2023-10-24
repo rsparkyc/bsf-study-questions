@@ -1,6 +1,6 @@
 import './TypeaheadTextarea.css';
 
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
 import debounce from 'lodash.debounce';
 
@@ -47,18 +47,19 @@ export const TypeaheadTextarea: React.FC<Props> = ({
     }
   }, [ghostValue]); // Only re-run the effect if ghostValue changes
 
-
-  const fetchSuggestions = useCallback(debounce(async (input: string) => {
+  const debouncedGenerateSuggestions = useMemo(() => debounce(async (input: string, setGhost: any) => {
     if (input === "") {
-      setGhostValue("");
-    }
-    else {
+      setGhost("");
+    } else {
       const suggestions = await generateSuggestions(input, suggestionsContext);
       const match = suggestions.find(s => s.startsWith(input));
-      setGhostValue(match || "");
+      setGhost(match || "");
     }
-  }, debounceTime), [generateSuggestions, suggestionsContext]);
+  }, debounceTime), [generateSuggestions, suggestionsContext, debounceTime]);
 
+  const fetchSuggestions = useCallback((input: string) => {
+    debouncedGenerateSuggestions(input, setGhostValue);
+  }, [debouncedGenerateSuggestions]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     const val = event.target.value;

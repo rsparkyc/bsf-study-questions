@@ -1,12 +1,10 @@
 import './SettingsComponent.css';
 
 import React, { useContext, useEffect, useState } from 'react';
-
-import SettingsContext from '../context/SettingsContext';
+import SettingsContext, { SettingName, defaultSettings } from '../context/SettingsContext';
 
 const SettingsComponent: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [fullLessonMode, setFullLessonMode] = useState(false);
   const { settings, setSettings } = useContext(SettingsContext);
 
 
@@ -14,21 +12,23 @@ const SettingsComponent: React.FC = () => {
   useEffect(() => {
     const savedSetting = localStorage.getItem('settings');
     if (savedSetting) {
-      setFullLessonMode(JSON.parse(savedSetting).fullLessonMode);
+      const loadedSettings = JSON.parse(savedSetting);
+      setSettings({ ...defaultSettings, ...loadedSettings });
+
     }
-  }, []);
+  }, [setSettings]);
 
   const toggleSettings = () => {
     setIsOpen(!isOpen);
   };
 
-  const handleCheckboxChange = () => {
-    const newSetting = !fullLessonMode;
-    setFullLessonMode(newSetting);
-
-    const newSettings = { ...settings, fullLessonMode: newSetting};
-    setSettings(newSettings);
-    localStorage.setItem('settings', JSON.stringify(newSettings));
+  const handleCheckboxChange = (settingName: SettingName) => {
+    return () => {
+      const newSettingValue = !settings[settingName];
+      const newSettings = { ...settings, [settingName]: newSettingValue };
+      setSettings(newSettings);
+      localStorage.setItem('settings', JSON.stringify(newSettings));
+    };
   };
 
   return (
@@ -42,11 +42,35 @@ const SettingsComponent: React.FC = () => {
             <label>
               <input
                 type="checkbox"
-                checked={fullLessonMode}
-                onChange={handleCheckboxChange}
+                checked={settings.fullLessonMode}
+                onChange={handleCheckboxChange('fullLessonMode')}
               />
               Full Lesson Mode
             </label>
+          </div>
+          <div className="settings-content">
+            <label>
+              <input
+                type="checkbox"
+                checked={settings.typeaheadSuggestions}
+                onChange={handleCheckboxChange('typeaheadSuggestions')}
+              />
+              Typeahead Suggestions
+            </label>
+            {settings.typeaheadSuggestions && (
+              <input
+                id="typeahead-api-key"
+                type="password"
+                placeholder="Enter API Key"
+                value={settings.typeaheadApiKey}
+                onChange={(e) => {
+                  const newSettings = { ...settings, typeaheadApiKey: e.target.value };
+                  setSettings(newSettings);
+                  localStorage.setItem('settings', JSON.stringify(newSettings));
+                }}
+              />
+            )}
+
           </div>
           <button onClick={toggleSettings}>Close</button>
         </div>
