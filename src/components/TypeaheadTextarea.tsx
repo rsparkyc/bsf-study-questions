@@ -125,6 +125,7 @@ export const TypeaheadTextarea: React.FC<Props> = ({
         value={inputValue}
         onChange={handleInputChange}
         onKeyDown={handleKeyDown}
+        onBlur={() => setGhostValue("")}
         className={"typeahead-input" + (additionalClassNames ? " " + additionalClassNames : "")}
         rows={rows}
         onScroll={handleScroll} // Attach the scroll event handler
