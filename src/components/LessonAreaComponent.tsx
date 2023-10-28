@@ -84,23 +84,44 @@ const LessonAreaComponent: React.FC<LessonDayProps> = ({ lessonDay, answersData,
         });
     }
 
-    const buildConversationConfig = (scriptures: string[], questionText: string, exitsingAnswer: string): ConversationConfig => {
-        return {
+    const buildConversationConfig = (scriptures: string[], questionText: string, existingAnswer: string): ConversationConfig | null => {
+        // if the user hasn't actually started a new sentence, we actually don't want to offer any suggestinos yet
+        // we can use a regex to see if it ends with a period and any number of other whitespace characters
+        const regex = new RegExp("\\.\\s*$");
+        if (regex.test(existingAnswer)) {
+            return null;
+        }
+
+        const [firstPart, secondPart]: string[] = splitOnLastIndexOf(existingAnswer, ". ");
+
+        const completionPhrase = "The sentence I want completed starts with this:"
+
+
+        let userContent = "Here are the verses I've read: \n" + scriptures.join("\n") + "\n\n" +
+                        "I am answering the following question: \n" + questionText + "\n\n";
+
+        if (secondPart) {
+            // if there's more than one sentence, we need to add all but the last one to the content
+            userContent += "So far, I've written this: \n" + firstPart + "\n\n";                        
+            userContent += completionPhrase + "\n" + secondPart;
+        }
+        else {
+            userContent += completionPhrase + "\n" + firstPart;
+        }
+
+        const config: ConversationConfig = {
             messages: [ 
                 {
                     role: "system",
                     content: "These are the laws by which you live by: \n" + 
                         "1) You are a text completion bot that helps with bible studies. \n" + 
                         "2) You will expect verses the user is referencing, as well as the question they're answering, and the text they've written. \n" +
-                        "3) You will attempt to complete their sentence using context from the verses. \n" +
-                        "4) You will only respond with the text completion, and not include the part of the sentence the user has already written. \n" +
-                        "5) If you've found that you've included the user's text, you will remove it."
+                        "3) You will attempt to complete their sentence using context from the verses and what was already written. \n" +
+                        "4) You will respond with the full sentence to be completed. You will recgonize it by the pharse \"" + completionPhrase + "\"\n"
                 },
                 {
                     role: "user",
-                    content: "Here are the verses I've read: \n" + scriptures.join("\n") + "\n\n" +
-                        "I am answering the following question: \n" + questionText + "\n\n" +
-                        "So far, I've written: \n" + exitsingAnswer
+                    content: userContent
                 }
 
             ],
@@ -112,10 +133,29 @@ const LessonAreaComponent: React.FC<LessonDayProps> = ({ lessonDay, answersData,
             ],
             model: "gpt-3.5-turbo"
         };
+
+        return config;
     }
 
 
-    const generateSuggestions = async (input: string, suggestionsContext: LessonDayQuestion) => {
+    function splitOnLastIndexOf(str: string, pattern: string): string[] {
+        const lastOccurrence: number = str.lastIndexOf(pattern);
+
+        if (lastOccurrence === -1) {
+            // The pattern doesn't exist in the string
+            return [str];
+        }
+
+        // Split the string based on the last occurrence of the pattern
+        const firstPart: string = str.substring(0, lastOccurrence);
+        const secondPart: string = str.substring(lastOccurrence + pattern.length);
+
+        return [firstPart, secondPart];
+    }
+
+
+
+    const generateSuggestions = async (input: string, suggestionsContext: LessonDayQuestion): Promise<Array<string>> => {
         if (settings.settings.typeaheadSuggestions === false) {
             // if typeahead suggestions are disabled, return an empty array
             return [];
@@ -133,21 +173,19 @@ const LessonAreaComponent: React.FC<LessonDayProps> = ({ lessonDay, answersData,
 
         //let's build the conversation config:
         const conversationConfig = buildConversationConfig(plaintextScriptures, questionText, input);
+        if (!conversationConfig) {
+            return [];
+        }
 
+        console.log('*********************');
+        console.log("conversationConfig: " + JSON.stringify(conversationConfig));
         const openAiRequest = new OpenAiCompletionRequest();
         const openAiResponse = await openAiRequest.makeRequest(conversationConfig, settings.settings.typeaheadApiKey);
+        console.log("openAiResponse: " + JSON.stringify(openAiResponse));
+        console.log('*********************');
        
         // iterate through the choices -> message -> content, prepend the input, and return as an array
-        return openAiResponse.choices.map(choice => choice.message.content).map(text => 
-            {
-                if (!text.startsWith(input)) {
-                    if (!input.endsWith(" ") && !text.startsWith(" ")) { 
-                        return input + " " + text;
-                    }
-                    return input + text ;
-                }
-                return text;
-            });
+        return openAiResponse.choices.map(choice => {return choice.message.content});
     };
 
 
@@ -206,7 +244,7 @@ const LessonAreaComponent: React.FC<LessonDayProps> = ({ lessonDay, answersData,
                         <TypeaheadTextarea 
                             generateSuggestions={generateSuggestions} 
                             suggestionsContext={question}
-                            suggestionsDebounceTime={500}
+                            suggestionsDebounceTime={1500}
                             rows={4} 
                             additionalClassNames={isPassageDiscovery(question) ? "passage-discovery-question" : "standard-question"}
                             placeholder='Write your answer here...'

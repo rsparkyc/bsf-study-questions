@@ -5,7 +5,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import debounce from 'lodash.debounce';
 
 type Props = {
-  generateSuggestions: (input: string, context: any) => Promise<string[]>;
+  generateSuggestions: (input: string, context: any) => Promise<Array<string>>;
   suggestionsContext: any;
   suggestionsDebounceTime?: number;
   additionalClassNames?: string;
@@ -47,18 +47,60 @@ export const TypeaheadTextarea: React.FC<Props> = ({
     }
   }, [ghostValue]); // Only re-run the effect if ghostValue changes
 
-  const debouncedGenerateSuggestions = useMemo(() => debounce(async (input: string, setGhost: any) => {
+  const debouncedGenerateSuggestions = useMemo(() => debounce(async (
+    input: string, 
+    setGhost: any, 
+    textareaElement: HTMLTextAreaElement
+  ) => {
+    // Check if the textarea is still focused, if not then don't do anything
+    if (document.activeElement !== textareaElement) {
+      return;
+    }
+
     if (input === "") {
       setGhost("");
     } else {
       const suggestions = await generateSuggestions(input, suggestionsContext);
-      const match = suggestions.find(s => s.startsWith(input));
-      setGhost(match || "");
+      // Check if the textarea is still focused, if not then abort
+      if (document.activeElement !== textareaElement) {
+        return;
+      }
+      console.log("suggestions", suggestions);
+      
+      const finalSuggestions = suggestions.map(suggestion => combineStrings(input, suggestion));
+      console.log("final suggestions", finalSuggestions);
+
+      if (finalSuggestions.length > 0) {
+        setGhost(finalSuggestions[0]);
+      }
+      else {
+        setGhost("");
+      }
     }
   }, debounceTime), [generateSuggestions, suggestionsContext, debounceTime]);
 
+  function combineStrings(str1: string, str2: string): string {
+    // Quick check: If str2 starts with str1, return str2
+    if (str2.startsWith(str1)) {
+      return str2;
+    }
+
+    // Find the largest suffix of str1 that's also a prefix of str2
+    for (let i = 0; i < str1.length; i++) {
+      const suffix = str1.substring(i);
+      if (str2.startsWith(suffix)) {
+        // Return the concatenation of str1 and the remaining part of str2
+        return str1 + str2.slice(suffix.length);
+      }
+    }
+
+      // If there's no overlapping part, simply concatenate str1 and str2
+      return str1 + str2;
+
+  }
+
   const fetchSuggestions = useCallback((input: string) => {
-    debouncedGenerateSuggestions(input, setGhostValue);
+    debouncedGenerateSuggestions(input, setGhostValue, mainTextareaRef.current!);
   }, [debouncedGenerateSuggestions]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -89,6 +131,10 @@ export const TypeaheadTextarea: React.FC<Props> = ({
       if (onChange) {
         onChange(ghostValue);
       }
+    }
+    if (event.code === "Escape" && ghostValue) {
+      event.preventDefault();
+      setGhostValue("");
     }
   };
 
