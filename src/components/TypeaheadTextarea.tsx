@@ -79,23 +79,23 @@ export const TypeaheadTextarea: React.FC<Props> = ({
     }
   }, debounceTime), [generateSuggestions, suggestionsContext, debounceTime]);
 
-  function combineStrings(str1: string, str2: string): string {
-    // Quick check: If str2 starts with str1, return str2
-    if (str2.startsWith(str1)) {
-      return str2;
+  function combineStrings(baseString: string, suffixString: string): string {
+    // Quick check: If suffixString starts with baseString, return suffixString
+    if (suffixString.toLowerCase().startsWith(baseString.toLowerCase())) {
+      return suffixString;
     }
 
-    // Find the largest suffix of str1 that's also a prefix of str2
-    for (let i = 0; i < str1.length; i++) {
-      const suffix = str1.substring(i);
-      if (str2.startsWith(suffix)) {
-        // Return the concatenation of str1 and the remaining part of str2
-        return str1 + str2.slice(suffix.length);
+    // Find the largest suffix of baseString that's also a prefix of suffixString
+    for (let i = 0; i < baseString.length; i++) {
+      const suffix = baseString.substring(i);
+      if (suffixString.toLowerCase().startsWith(suffix.toLowerCase())) {
+        // Return the concatenation of baseString and the remaining part of suffixString
+        return baseString + suffixString.slice(suffix.length);
       }
     }
 
-      // If there's no overlapping part, simply concatenate str1 and str2
-      return str1 + str2;
+      // If there's no overlapping part, simply concatenate baseString and suffixString
+      return baseString + suffixString;
 
   }
 

@@ -96,7 +96,6 @@ const LessonAreaComponent: React.FC<LessonDayProps> = ({ lessonDay, answersData,
 
         const completionPhrase = "The sentence I want completed starts with this:"
 
-
         let userContent = "Here are the verses I've read: \n" + scriptures.join("\n") + "\n\n" +
                         "I am answering the following question: \n" + questionText + "\n\n";
 
@@ -137,7 +136,6 @@ const LessonAreaComponent: React.FC<LessonDayProps> = ({ lessonDay, answersData,
         return config;
     }
 
-
     function splitOnLastIndexOf(str: string, pattern: string): string[] {
         const lastOccurrence: number = str.lastIndexOf(pattern);
 
@@ -152,8 +150,6 @@ const LessonAreaComponent: React.FC<LessonDayProps> = ({ lessonDay, answersData,
 
         return [firstPart, secondPart];
     }
-
-
 
     const generateSuggestions = async (input: string, suggestionsContext: LessonDayQuestion): Promise<Array<string>> => {
         if (settings.settings.typeaheadSuggestions === false) {
@@ -187,7 +183,6 @@ const LessonAreaComponent: React.FC<LessonDayProps> = ({ lessonDay, answersData,
         // iterate through the choices -> message -> content, prepend the input, and return as an array
         return openAiResponse.choices.map(choice => {return choice.message.content});
     };
-
 
     return (
         <div className="lesson-area">
