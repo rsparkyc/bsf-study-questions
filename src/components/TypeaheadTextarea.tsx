@@ -2,6 +2,7 @@ import './TypeaheadTextarea.css';
 
 import React, { useCallback, useMemo, useState } from 'react';
 
+import StringUtils from '../utils/StringUtils';
 import debounce from 'lodash.debounce';
 
 type Props = {
@@ -67,7 +68,7 @@ export const TypeaheadTextarea: React.FC<Props> = ({
       }
       console.log("suggestions", suggestions);
       
-      const finalSuggestions = suggestions.map(suggestion => combineStrings(input, suggestion));
+      const finalSuggestions = suggestions.map(suggestion => StringUtils.combineStrings(input, suggestion));
       console.log("final suggestions", finalSuggestions);
 
       if (finalSuggestions.length > 0) {
@@ -79,25 +80,6 @@ export const TypeaheadTextarea: React.FC<Props> = ({
     }
   }, debounceTime), [generateSuggestions, suggestionsContext, debounceTime]);
 
-  function combineStrings(baseString: string, suffixString: string): string {
-    // Quick check: If suffixString starts with baseString, return suffixString
-    if (suffixString.toLowerCase().startsWith(baseString.toLowerCase())) {
-      return suffixString;
-    }
-
-    // Find the largest suffix of baseString that's also a prefix of suffixString
-    for (let i = 0; i < baseString.length; i++) {
-      const suffix = baseString.substring(i);
-      if (suffixString.toLowerCase().startsWith(suffix.toLowerCase())) {
-        // Return the concatenation of baseString and the remaining part of suffixString
-        return baseString + suffixString.slice(suffix.length);
-      }
-    }
-
-      // If there's no overlapping part, simply concatenate baseString and suffixString
-      return baseString + suffixString;
-
-  }
 
   const fetchSuggestions = useCallback((input: string) => {
     debouncedGenerateSuggestions(input, setGhostValue, mainTextareaRef.current!);
