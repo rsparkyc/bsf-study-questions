@@ -1,4 +1,5 @@
 export default class StringUtils {
+    //TODO: use a pattern array instead of a string
     static splitOnLastIndexOf = (str: string, pattern: string): string[] => {
         const lastOccurrence: number = str.lastIndexOf(pattern);
 

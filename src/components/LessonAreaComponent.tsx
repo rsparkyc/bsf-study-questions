@@ -141,6 +141,9 @@ const LessonAreaComponent: React.FC<LessonDayProps> = ({
     ): ConversationConfig | null => {
         // if the user hasn't actually started a new sentence, we actually don't want to offer any suggestions yet
         // we can use a regex to see if it ends with a period and any number of other whitespace characters
+
+        // TODO: look for other punctuation marks, like question marks, exclamation points, etc.
+
         const regex = new RegExp("\\.\\s*$");
         if (regex.test(existingAnswer)) {
             return null;
@@ -152,10 +155,16 @@ const LessonAreaComponent: React.FC<LessonDayProps> = ({
         const completionPhrase =
             "The sentence I want completed starts with this:";
 
+        let scripturesPrompt = "";
+        if (scriptures.length > 0) {
+            scripturesPrompt =
+                "Here are the verses I've read: \n" +
+                scriptures.join("\n") +
+                "\n\n";
+        }
+
         let userContent =
-            "Here are the verses I've read: \n" +
-            scriptures.join("\n") +
-            "\n\n" +
+            scripturesPrompt +
             "I am answering the following question: \n" +
             questionText +
             "\n\n";
@@ -177,9 +186,9 @@ const LessonAreaComponent: React.FC<LessonDayProps> = ({
                     content:
                         "These are the specifications by which you will tailor your responses: \n" +
                         "1) You are generating sentences to aid users with Bible studies by offering the completion of a sentence they've already typed. \n" +
-                        "2) You will expect verses the user is referencing. \n" +
+                        "2) You will sometimes be provided with verses the user is referencing. \n" +
                         "3) You will expect the question they're answering, and the text they've written. \n" +
-                        "4) You will attempt to complete their sentence using context from the verses and what was already written. \n" +
+                        "4) You will provide a completed version of their sentence using context from the verses, question, and what was already written. \n" +
                         '5) You will respond with the full sentence to be completed. You will recognize it by the phrase "' +
                         completionPhrase +
                         '"\n' +
@@ -260,30 +269,39 @@ const LessonAreaComponent: React.FC<LessonDayProps> = ({
             {/* Display Lesson Day Title */}
             <h2>{lessonDay.lessonDayTranslations[0].title}</h2>
 
-            <div className="scriptures">
-                <h3>Scriptures for the Day:</h3>
-                <ul>
-                    {lessonDay.lessonDayScriptures.map((scriptureReference) => {
-                        const matchingScripture = scripturesData?.data.find(
-                            (s) =>
-                                s.scriptureId === scriptureReference.scriptureId
-                        );
-                        return (
-                            <li key={scriptureReference.scriptureId}>
-                                {matchingScripture && (
-                                    <Scripture
-                                        scriptureData={matchingScripture}
-                                        verseReferences={
-                                            scriptureReference.scripture
-                                                .chapterVerses
-                                        }
-                                    />
-                                )}
-                            </li>
-                        );
-                    })}
-                </ul>
-            </div>
+            {/* Display Scriptures of the Day, but only if it has any */}
+            {lessonDay.lessonDayScriptures.length > 0 && (
+                <div className="scriptures">
+                    <h3>Scriptures for the Day:</h3>
+                    <ul>
+                        {lessonDay.lessonDayScriptures.map(
+                            (scriptureReference) => {
+                                const matchingScripture =
+                                    scripturesData?.data.find(
+                                        (s) =>
+                                            s.scriptureId ===
+                                            scriptureReference.scriptureId
+                                    );
+                                return (
+                                    <li key={scriptureReference.scriptureId}>
+                                        {matchingScripture && (
+                                            <Scripture
+                                                scriptureData={
+                                                    matchingScripture
+                                                }
+                                                verseReferences={
+                                                    scriptureReference.scripture
+                                                        .chapterVerses
+                                                }
+                                            />
+                                        )}
+                                    </li>
+                                );
+                            }
+                        )}
+                    </ul>
+                </div>
+            )}
 
             {/* Display Questions */}
             <div className="questions">
