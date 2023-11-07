@@ -8,10 +8,17 @@ interface LectureAndNotesProps {
     lessonId: number;
 }
 
+enum MaterialType {
+    LECTURE = 1,
+    AUDIO_NOTES = 2,
+    HTML_NOTES = 3,
+}
+
 interface FilteredMaterial {
     name: string;
     materialId: number;
     url: string;
+    materialType: MaterialType;
 }
 
 const LectureAndNotesComponent: React.FC<LectureAndNotesProps> = ({
@@ -21,6 +28,17 @@ const LectureAndNotesComponent: React.FC<LectureAndNotesProps> = ({
 
     const [materials, setMaterials] = useState<FilteredMaterial[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
+
+    const getFileUrl = async (material: Material): Promise<string> => {
+        if (material.fileLocationUrlWithSas) {
+            return material.fileLocationUrlWithSas;
+        }
+        const downloadRequest = new MaterialsDownloadRequest(
+            AuthContextHolder.getAuthContext(),
+            material.materialId
+        );
+        return (await downloadRequest.makeRequest()).url;
+    };
 
     useEffect(() => {
         if (lessonId) {
@@ -36,6 +54,8 @@ const LectureAndNotesComponent: React.FC<LectureAndNotesProps> = ({
                     // Filter out the materials that aren't lectures or HTML notes
                     const filteredMaterials: FilteredMaterial[] = [];
                     for (const material of materialsResponse) {
+                        const name = material.translations[0].name;
+                        const materialId = material.materialId;
                         if (
                             material.materialCategoryId === 2 &&
                             material.materialTypeId === 1 &&
@@ -44,19 +64,33 @@ const LectureAndNotesComponent: React.FC<LectureAndNotesProps> = ({
                                 .toLocaleLowerCase()
                                 .endsWith(".html")
                         ) {
-                            const name = material.translations[0].name;
-                            const downloadRequest =
-                                new MaterialsDownloadRequest(
-                                    AuthContextHolder.getAuthContext(),
-                                    material.materialId
-                                );
-                            const url = (await downloadRequest.makeRequest())
-                                .url;
-                            const materialId = material.materialId;
-
-                            filteredMaterials.push({ name, materialId, url });
+                            const url = await getFileUrl(material);
+                            const materialType = MaterialType.HTML_NOTES;
+                            filteredMaterials.push({
+                                name,
+                                materialId,
+                                url,
+                                materialType,
+                            });
+                        } else if (
+                            material.materialCategoryId === 2 &&
+                            material.materialTypeId === 1 &&
+                            material.materialFileTypeId === 3
+                        ) {
+                            const url = await getFileUrl(material);
+                            const materialType = MaterialType.AUDIO_NOTES;
+                            filteredMaterials.push({
+                                name,
+                                materialId,
+                                url,
+                                materialType,
+                            });
                         }
                     }
+
+                    filteredMaterials.sort((a, b) => {
+                        return a.materialType - b.materialType;
+                    });
 
                     setMaterials(filteredMaterials);
                 } catch (error) {
@@ -86,12 +120,21 @@ const LectureAndNotesComponent: React.FC<LectureAndNotesProps> = ({
                     <a href={material.url} target="_blank" rel="noreferrer">
                         {material.name}
                     </a>
-                    <iframe
-                        src={material.url}
-                        title={material.name}
-                        width="100%"
-                        height="500px"
-                    ></iframe>
+                    {material.materialType === MaterialType.HTML_NOTES && (
+                        <iframe
+                            src={material.url}
+                            title={material.name}
+                            width="100%"
+                            height="500px"
+                        ></iframe>
+                    )}
+                    {material.materialType === MaterialType.AUDIO_NOTES && (
+                        <div className="notes-audio-area">
+                            <audio controls>
+                                <source src={material.url} type="audio/mpeg" />
+                            </audio>
+                        </div>
+                    )}
                 </div>
             ))}
         </div>
