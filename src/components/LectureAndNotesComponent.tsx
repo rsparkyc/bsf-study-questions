@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { AuthContextHolder } from "../api/bsf/AuthContext";
 import { MaterialsDownloadRequest } from "../api/bsf/requests/MaterialsDownloadRequest";
