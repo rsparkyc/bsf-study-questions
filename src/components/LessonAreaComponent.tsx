@@ -11,6 +11,7 @@ import React, { useContext } from "react";
 import AllScripturesResponse from "../api/bsf/response/AllScripturesResponse";
 import AnswersResponse from "../api/bsf/response/AnswersResponse";
 import { AuthContextHolder } from "../api/bsf/AuthContext";
+import LectureAndNotesComponent from "./LectureAndNotesComponent";
 import { SaveQuestionRequest } from "../api/bsf/requests/SaveQuestionRequest";
 import Scripture from "./ScriptureComponent";
 import SettingsContext from "../context/SettingsContext";
@@ -20,12 +21,14 @@ import debounce from "lodash.debounce";
 
 interface LessonDayProps {
     lessonDay: LessonDay | undefined;
+    previousLessonId: number | undefined;
     answersData: AnswersResponse | undefined;
     scripturesData: AllScripturesResponse | undefined;
 }
 
 const LessonAreaComponent: React.FC<LessonDayProps> = ({
     lessonDay,
+    previousLessonId,
     answersData,
     scripturesData,
 }) => {
@@ -268,7 +271,6 @@ const LessonAreaComponent: React.FC<LessonDayProps> = ({
         <div className="lesson-area">
             {/* Display Lesson Day Title */}
             <h2>{lessonDay.lessonDayTranslations[0].title}</h2>
-
             {/* Display Scriptures of the Day, but only if it has any */}
             {lessonDay.lessonDayScriptures.length > 0 && (
                 <div className="scriptures">
@@ -302,7 +304,10 @@ const LessonAreaComponent: React.FC<LessonDayProps> = ({
                     </ul>
                 </div>
             )}
-
+            {/* Display Lecture and Notes, if any, but only on the first day, and show it for previousLessonDay (if defined)*/}
+            {lessonDay.dayOfWeek === 1 && previousLessonId !== undefined && (
+                <LectureAndNotesComponent lessonId={previousLessonId} />
+            )}
             {/* Display Questions */}
             <div className="questions">
                 {lessonDay.lessonDayQuestions.map((question) => (

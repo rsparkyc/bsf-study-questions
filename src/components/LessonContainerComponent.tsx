@@ -127,6 +127,22 @@ const LessonContainer: React.FC = () => {
                                     )
                             );
 
+                            // we want to get the previous lesson id (for the lecture and notes).
+                            // We can do this by getting the index of the current lesson and subtracting 1,
+                            // then getting the lesson id at that index.
+
+                            const currentLessonIndex =
+                                currentStudy?.lessons.findIndex(
+                                    (lesson) =>
+                                        lesson.lessonId === currentLessonId
+                                );
+                            const previousLessonId =
+                                currentLessonIndex && currentLessonIndex > 0
+                                    ? currentStudy?.lessons[
+                                          currentLessonIndex! - 1
+                                      ]?.lessonId
+                                    : undefined;
+
                             return currentLesson?.lessonDays.map(
                                 (day) =>
                                     (settings.settings.fullLessonMode ||
@@ -135,6 +151,9 @@ const LessonContainer: React.FC = () => {
                                         <div key={day.lessonDayId}>
                                             <LessonAreaComponent
                                                 key={day.lessonDayId}
+                                                previousLessonId={
+                                                    previousLessonId
+                                                }
                                                 lessonDay={day}
                                                 answersData={answersData}
                                                 scripturesData={scripturesData}
