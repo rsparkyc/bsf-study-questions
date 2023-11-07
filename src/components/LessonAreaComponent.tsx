@@ -204,7 +204,7 @@ const LessonAreaComponent: React.FC<LessonDayProps> = ({
             max_tokens: existingTextLength + 25,
             n: 1,
             stop: ["\n", "."],
-            model: "gpt-4",
+            model: "gpt-4-1106-preview",
         };
 
         return config;
