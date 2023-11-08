@@ -44,6 +44,7 @@
 
 .disclaimer-drawer.open {
     height: auto;
+    display: block;
 }
 
 .login-header {
@@ -120,4 +121,5 @@ button {
     padding-top: 20px;
     width: 500px;
     text-align: justify;
+    display: none;
 }
