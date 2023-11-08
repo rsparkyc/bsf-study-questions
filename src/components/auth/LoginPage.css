@@ -102,7 +102,7 @@ button {
 
 .dev-mode-panel > textarea {
     width: 500px;
-    height: 200px;;
+    height: 200px;
 }
 
 .button-and-settings-container {
@@ -112,6 +112,12 @@ button {
     /* This will vertically center the items in the flex container */
 }
 
-.login-header>div {
+.login-header > div {
     display: inline-flex;
+}
+
+.disclaimer-drawer {
+    padding-top: 20px;
+    width: 500px;
+    text-align: justify;
 }

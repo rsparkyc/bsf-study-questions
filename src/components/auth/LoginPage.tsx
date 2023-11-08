@@ -29,6 +29,9 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginStateChange }) => {
     );
 
     const [isDisclaimerOpen, setIsDisclaimerOpen] = useState(false);
+    const [disclaimerAccepted, setDisclaimerAccepted] = useState<
+        boolean | undefined
+    >();
 
     const [isLoggingIn, setIsLoggingIn] = useState(false);
     const [error, setError] = useState<null | string>(null);
@@ -56,6 +59,13 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginStateChange }) => {
     };
 
     const handleLogin = async () => {
+        if (!disclaimerAccepted) {
+            setError(
+                "Please read and accept the disclaimer before logging in."
+            );
+            return;
+        }
+
         setIsLoggingIn(true);
         setError(null);
 
@@ -140,6 +150,30 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginStateChange }) => {
             setLoggedIn(parsedToken);
         }
     }, [setLoggedIn]);
+
+    useEffect(() => {
+        // Check local storage for the disclaimer state when the component mounts
+        const savedDisclaimerState = localStorage.getItem("disclaimerAccepted");
+
+        console.log("Saved disclaimer state is ", savedDisclaimerState);
+        if (savedDisclaimerState) {
+            setDisclaimerAccepted(JSON.parse(savedDisclaimerState));
+        }
+    }, []);
+
+    useEffect(() => {
+        // Save the disclaimer state to local storage whenever it changes
+        if (disclaimerAccepted !== undefined) {
+            console.log(
+                "Saving disclaimer state to local storage, current state is ",
+                disclaimerAccepted
+            );
+            localStorage.setItem(
+                "disclaimerAccepted",
+                JSON.stringify(disclaimerAccepted)
+            );
+        }
+    }, [disclaimerAccepted]);
 
     const doTokenRefresh = useCallback(async () => {
         if (AuthContextHolder.hasAuthContext()) {
@@ -239,11 +273,15 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginStateChange }) => {
                             placeholder="Password"
                         />
                         <button
-                            disabled={isLoggingIn}
+                            disabled={isLoggingIn || !disclaimerAccepted}
                             className="login-button"
                             onClick={handleLogin}
                         >
-                            {isLoggingIn ? "Logging in..." : "Login"}
+                            {isLoggingIn
+                                ? "Logging in..."
+                                : disclaimerAccepted
+                                ? "Login"
+                                : "Please Read Disclaimer"}
                         </button>
                         <button
                             className="disclaimer-button"
@@ -264,17 +302,31 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginStateChange }) => {
                     isDisclaimerOpen ? "open" : ""
                 }`}
             >
-                Warning. This site is not official and is not affiliated with
-                the{" "}
+                <strong>Disclaimer:</strong> This site is an independent
+                platform and has no official connection with the{" "}
                 <a href="https://www.bsfinternational.org/">
-                    Bible Study Fellowship
-                </a>{" "}
-                organization. AWS Lambda is used as a proxy to the BSF API
-                because of CORS issues for many requests, and thus your username
-                and password must be proxied through. Because I take your
-                privacy seriously, I do not log or store your username or
-                password. If you have any conserns, please refain from using
-                this site.
+                    Bible Study Fellowship (BSF) organization
+                </a>
+                . Due to technical constraints, this site employs AWS Lambda as
+                a proxy to interact with the BSF API, which necessitates passing
+                your login credentials through it. Rest assured, your privacy is
+                a top priority—we do not record or retain your username and
+                password. Use this site at your own discretion. Should you have
+                privacy concerns, you are advised to opt out of using this
+                service.
+                <br />
+                <br />
+                <label>
+                    <input
+                        type="checkbox"
+                        checked={disclaimerAccepted}
+                        onChange={(e) =>
+                            setDisclaimerAccepted(e.target.checked)
+                        }
+                    />
+                    I have read and understand this disclaimer and accept the
+                    implications of using this site.
+                </label>
             </div>
         </div>
     );
