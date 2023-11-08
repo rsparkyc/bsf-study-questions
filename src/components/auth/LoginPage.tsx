@@ -155,7 +155,6 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginStateChange }) => {
         // Check local storage for the disclaimer state when the component mounts
         const savedDisclaimerState = localStorage.getItem("disclaimerAccepted");
 
-        console.log("Saved disclaimer state is ", savedDisclaimerState);
         if (savedDisclaimerState) {
             setDisclaimerAccepted(JSON.parse(savedDisclaimerState));
         }
@@ -164,10 +163,6 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginStateChange }) => {
     useEffect(() => {
         // Save the disclaimer state to local storage whenever it changes
         if (disclaimerAccepted !== undefined) {
-            console.log(
-                "Saving disclaimer state to local storage, current state is ",
-                disclaimerAccepted
-            );
             localStorage.setItem(
                 "disclaimerAccepted",
                 JSON.stringify(disclaimerAccepted)
@@ -187,9 +182,14 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginStateChange }) => {
                     console.error("No access token after refresh, logging out");
                     handleLogout();
                 }
-            } catch (err) {
-                console.error("Failed to refresh token, logging out", err);
-                handleLogout();
+            } catch (err: any) {
+                if (err.code !== "ERR_NETWORK") {
+                    console.error("Failed to refresh token, logging out", err);
+                    handleLogout();
+                } else {
+                    // we'll just keep trying until we actually do connect to the network,
+                    // but we could try to set an "offline" mode here
+                }
             }
         }
     }, [setLoggedIn, handleLogout]);
