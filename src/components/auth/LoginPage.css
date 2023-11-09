@@ -81,18 +81,13 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    /* Centers child elements */
     justify-content: center;
-    /* This could be optional */
     height: auto;
-    /* Full viewport height */
     width: 100%;
-    /* Takes up full container width */
 }
 
 button {
     min-width: 100px;
-    /* Or whatever minimum makes sense */
     padding: 5px 15px;
 }
 
@@ -108,9 +103,7 @@ button {
 
 .button-and-settings-container {
     display: flex;
-    /* This makes it a flex container */
     align-items: center;
-    /* This will vertically center the items in the flex container */
 }
 
 .login-header > div {

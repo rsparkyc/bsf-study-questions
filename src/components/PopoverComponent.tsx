@@ -1,19 +1,24 @@
 import "./PopoverComponent.css";
 
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
-export const PopoverComponent: React.FC<{ content: string }> = ({ content }) => {
+export const PopoverComponent: React.FC<{ content: string }> = ({
+    content,
+}) => {
     const [isHovered, setIsHovered] = useState(false);
 
     return (
-        <span 
+        <span
+            className="popover-icon"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
             🗒️
             {isHovered && (
-                <div className="popover-content" dangerouslySetInnerHTML={{__html: content}}>
-                </div>
+                <div
+                    className="popover-content"
+                    dangerouslySetInnerHTML={{ __html: content }}
+                ></div>
             )}
         </span>
     );

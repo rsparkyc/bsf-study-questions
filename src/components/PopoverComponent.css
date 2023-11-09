@@ -46,3 +46,11 @@
     text-decoration: underline;
     /* underlined text */
 }
+
+.popover-icon {
+    font-size: 0.7em;
+}
+
+.popover-icon .popover-content {
+    font-size: 1.5em;
+}
