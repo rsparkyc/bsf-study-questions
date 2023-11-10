@@ -34,6 +34,8 @@ const LessonAreaComponent: React.FC<LessonDayProps> = ({
 }) => {
     const settings = useContext(SettingsContext);
 
+    const completionPhrase = "The sentence I want completed starts with this:";
+
     if (!lessonDay) {
         return <div>Loading Lesson Day Information...</div>;
     }
@@ -155,9 +157,6 @@ const LessonAreaComponent: React.FC<LessonDayProps> = ({
         const [firstPart, secondPart]: string[] =
             StringUtils.splitOnLastIndexOf(existingAnswer, ". ");
 
-        const completionPhrase =
-            "The sentence I want completed starts with this:";
-
         let scripturesPrompt = "";
         if (scriptures.length > 0) {
             scripturesPrompt =
@@ -263,8 +262,15 @@ const LessonAreaComponent: React.FC<LessonDayProps> = ({
 
         // iterate through the choices  and return the choice -> message -> content
         return openAiResponse.choices.map((choice) => {
-            return choice.message.content;
+            return processMessageContent(choice.message.content);
         });
+    };
+
+    const processMessageContent = (content: string): string => {
+        // Sometimes the message starts with "The sentence I want completed starts with this:"
+        // Let's remove that
+
+        return content.replace(completionPhrase, "").trimStart();
     };
 
     return (
