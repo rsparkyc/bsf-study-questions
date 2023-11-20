@@ -143,23 +143,49 @@ const LessonContainer: React.FC = () => {
                                       ]?.lessonId
                                     : undefined;
 
-                            return currentLesson?.lessonDays.map(
-                                (day) =>
-                                    (settings.settings.fullLessonMode ||
-                                        day.lessonDayId ===
-                                            currentLessonDayId) && (
-                                        <div key={day.lessonDayId}>
-                                            <LessonAreaComponent
-                                                key={day.lessonDayId}
-                                                previousLessonId={
-                                                    previousLessonId
+                            return (
+                                <React.Fragment>
+                                    {
+                                        <div id="lesson-title">
+                                            <h1>
+                                                {
+                                                    currentLesson
+                                                        ?.lessonTranslations[0]
+                                                        .title
                                                 }
-                                                lessonDay={day}
-                                                answersData={answersData}
-                                                scripturesData={scripturesData}
-                                            />
+                                            </h1>
+                                            <h3>
+                                                {
+                                                    currentLesson
+                                                        ?.lessonTranslations[0]
+                                                        .scripture
+                                                }
+                                            </h3>
                                         </div>
-                                    )
+                                    }
+                                    {currentLesson?.lessonDays.map(
+                                        (day) =>
+                                            (settings.settings.fullLessonMode ||
+                                                day.lessonDayId ===
+                                                    currentLessonDayId) && (
+                                                <div key={day.lessonDayId}>
+                                                    <LessonAreaComponent
+                                                        key={day.lessonDayId}
+                                                        previousLessonId={
+                                                            previousLessonId
+                                                        }
+                                                        lessonDay={day}
+                                                        answersData={
+                                                            answersData
+                                                        }
+                                                        scripturesData={
+                                                            scripturesData
+                                                        }
+                                                    />
+                                                </div>
+                                            )
+                                    )}
+                                </React.Fragment>
                             );
                         })()}
                 </div>

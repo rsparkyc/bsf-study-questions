@@ -33,3 +33,11 @@
     display: flex;
     flex-direction: column;
 }
+
+#lesson-title h1 {
+    margin-bottom: 0px;
+}
+
+#lesson-title h3 {
+    margin-top: 0px;
+}
