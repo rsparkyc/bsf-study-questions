@@ -1,25 +1,31 @@
-import { AxiosResponse, Method } from 'axios';
+import { AxiosResponse, Method } from "axios";
 
-import AuthContext from '../../AuthContext';
-import { BsfProxiedRequest } from './BsfProxiedRequest';
+import AuthContext from "../../AuthContext";
+import { BsfProxiedRequest } from "./BsfProxiedRequest";
+import SelfAssertedResponse from "../../response/SelfAssertedResponse";
 
-export class SelfAssertedRequest extends BsfProxiedRequest<string> {
+export class SelfAssertedRequest extends BsfProxiedRequest<SelfAssertedResponse> {
     constructor(protected authContext: AuthContext) {
         super(authContext);
     }
 
     protected getRequestMethod(): Method {
-        return 'POST';
+        return "POST";
     }
 
     protected addAdditionalHeaders(headers: Record<string, string>): void {
         headers["x-csrf-token"] = this.authContext.csrf!;
-        headers["content-type"] = "application/x-www-form-urlencoded; charset=UTF-8";
+        headers["content-type"] =
+            "application/x-www-form-urlencoded; charset=UTF-8";
     }
 
     protected getRequestBody(): string | null {
-        return "request_type=RESPONSE&signInName=" + encodeURIComponent(this.authContext.credentials.email) +
-            "&password=" + encodeURIComponent(this.authContext.credentials.password);
+        return (
+            "request_type=RESPONSE&signInName=" +
+            encodeURIComponent(this.authContext.credentials.email) +
+            "&password=" +
+            encodeURIComponent(this.authContext.credentials.password)
+        );
     }
 
     protected processResponse(response: AxiosResponse): void {
@@ -36,10 +42,10 @@ export class SelfAssertedRequest extends BsfProxiedRequest<string> {
 
         if (this.authContext.cookies) {
             this.authContext.cookies.forEach((cookie) => {
-                if (cookie.startsWith('x-ms-cpim-csrf')) {
-                    const index = cookie.indexOf('=');
+                if (cookie.startsWith("x-ms-cpim-csrf")) {
+                    const index = cookie.indexOf("=");
                     const key = cookie.substring(0, index);
-                    const val = cookie.substring(index + 1).split(';')[0];
+                    const val = cookie.substring(index + 1).split(";")[0];
                     newCookies[key] = val;
                 }
             });
@@ -50,14 +56,14 @@ export class SelfAssertedRequest extends BsfProxiedRequest<string> {
             finalCookies.push(key + "=" + newCookies[key]);
         });
         this.authContext.cookies = finalCookies;
-
     }
 
     protected generateUrl(): string {
-        const url = "https://login.mybsf.org/bsfmcaiamprod.onmicrosoft.com/B2C_1A_SignUpOrSignin/SelfAsserted?" +
-            "tx=StateProperties=" + this.authContext.state +
+        const url =
+            "https://login.mybsf.org/bsfmcaiamprod.onmicrosoft.com/B2C_1A_SignUpOrSignin/SelfAsserted?" +
+            "tx=StateProperties=" +
+            this.authContext.state +
             "&p=B2C_1A_SignUpOrSignin";
         return url;
-
     }
 }

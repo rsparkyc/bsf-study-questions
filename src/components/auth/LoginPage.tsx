@@ -86,7 +86,15 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginStateChange }) => {
                 const selfAssertedRequest = new SelfAssertedRequest(
                     authContext
                 );
-                await selfAssertedRequest.makeRequest();
+                const selfAssertedResponse =
+                    await selfAssertedRequest.makeRequest();
+                if (selfAssertedResponse.status !== "200") {
+                    throw new Error(
+                        selfAssertedResponse.message
+                            ? selfAssertedResponse.message
+                            : "There was an error logging you in"
+                    );
+                }
 
                 const confirmedRequest = new ConfirmedRequest(authContext);
                 await confirmedRequest.makeRequest();
@@ -102,10 +110,11 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginStateChange }) => {
 
             setLoggedIn(newToken);
             setIsDisclaimerOpen(false);
-        } catch (err) {
+        } catch (err: any) {
             console.error("Failed to login:", err);
             setError(
-                "Failed to login. Please check your username and password and try again."
+                "Failed to login. Please check your username and password and try again." +
+                    (err.message ? " (" + err.message + ")" : "")
             );
         } finally {
             setIsLoggingIn(false);
