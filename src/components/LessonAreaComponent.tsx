@@ -171,12 +171,12 @@ const LessonAreaComponent: React.FC<LessonDayProps> = ({
             questionText +
             "\n\n";
 
-        let existingTextLength = firstPart.length;
+        let existingTextLength = tokenCount(firstPart);
         if (secondPart) {
             // if there's more than one sentence, we need to add all but the last one to the content
             userContent += "So far, I've written this: \n" + firstPart + "\n\n";
             userContent += completionPhrase + "\n" + secondPart;
-            existingTextLength = secondPart.length;
+            existingTextLength = tokenCount(secondPart);
         } else {
             userContent += completionPhrase + "\n" + firstPart;
         }
@@ -203,13 +203,19 @@ const LessonAreaComponent: React.FC<LessonDayProps> = ({
                     content: userContent,
                 },
             ],
-            max_tokens: existingTextLength + 25,
+            max_tokens: existingTextLength + settings.settings.typeaheadLength,
             n: 1,
             stop: ["\n", "."],
             model: "gpt-4-1106-preview",
         };
 
         return config;
+    };
+
+    // counts the occurrences of spaces, periods, and commas in phrase to calculate token length:
+    const tokenCount = (phrase: string): number => {
+        // uses a regex and finds the number of matches
+        return phrase.match(/[\s.,]/g || [])?.length || 0;
     };
 
     const generateSuggestions = async (
