@@ -37,6 +37,10 @@
     color: #666;
 }
 
-.wj {
+.expanded-scripture .wj {
     color: red;
+}
+
+.expanded-scripture .iex {
+    font-style: italic;
 }
