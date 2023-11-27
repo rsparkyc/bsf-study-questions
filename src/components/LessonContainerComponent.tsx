@@ -80,6 +80,22 @@ const LessonContainer: React.FC = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    const goToNextDay = () => {
+        if (currentLessonDayId && lessonData) {
+            debugger;
+            // your logic to find the next lessonDayId
+            // Update the currentLessonDayId and currentDayIndex accordingly
+        }
+    };
+
+    const goToPreviousDay = () => {
+        if (currentLessonDayId && lessonData) {
+            debugger;
+            // your logic to find the previous lessonDayId
+            // Update the currentLessonDayId and currentDayIndex accordingly
+        }
+    };
+
     return (
         <div className="lesson-container">
             <Breadcrumbs
@@ -143,6 +159,30 @@ const LessonContainer: React.FC = () => {
                                       ]?.lessonId
                                     : undefined;
 
+                            const currentLessonDayIndex =
+                                currentLesson?.lessonDays.findIndex(
+                                    (day) =>
+                                        day.lessonDayId === currentLessonDayId
+                                );
+
+                            const nextLessonDayId =
+                                currentLessonDayIndex !== undefined &&
+                                currentLesson?.lessonDays.length &&
+                                currentLessonDayIndex <
+                                    currentLesson?.lessonDays.length - 1
+                                    ? currentLesson?.lessonDays[
+                                          currentLessonDayIndex! + 1
+                                      ]?.lessonDayId
+                                    : undefined;
+
+                            const previousLessonDayId =
+                                currentLessonDayIndex !== undefined &&
+                                currentLessonDayIndex
+                                    ? currentLesson?.lessonDays[
+                                          currentLessonDayIndex! - 1
+                                      ]?.lessonDayId
+                                    : undefined;
+
                             return (
                                 <React.Fragment>
                                     {
@@ -185,6 +225,18 @@ const LessonContainer: React.FC = () => {
                                                 </div>
                                             )
                                     )}
+                                    <div className="lesson-prev-next">
+                                        {previousLessonDayId && (
+                                            <button onClick={goToPreviousDay}>
+                                                Previous Day
+                                            </button>
+                                        )}
+                                        {nextLessonDayId && (
+                                            <button onClick={goToNextDay}>
+                                                Next Day
+                                            </button>
+                                        )}
+                                    </div>
                                 </React.Fragment>
                             );
                         })()}

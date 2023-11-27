@@ -42,3 +42,9 @@
 #lesson-title h3 {
     margin-top: 0px;
 }
+
+.lesson-prev-next {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px;
+}
