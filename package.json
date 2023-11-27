@@ -51,6 +51,7 @@
     "@types/randombytes": "^2.0.0",
     "jest": "^27.5.1",
     "react-app-rewired": "^2.2.1",
+    "tailwindcss": "^3.3.5",
     "typescript": "^5.0.2"
   }
 }
