@@ -81,18 +81,76 @@ const LessonContainer: React.FC = () => {
     }, []);
 
     const goToNextDay = () => {
-        if (currentLessonDayId && lessonData) {
-            debugger;
-            // your logic to find the next lessonDayId
-            // Update the currentLessonDayId and currentDayIndex accordingly
+        const surroundingLessonDayIds = getSurroundingLessonDayIds();
+        if (
+            surroundingLessonDayIds &&
+            surroundingLessonDayIds.nextLessonDayId
+        ) {
+            setCurrentLessonDayId(surroundingLessonDayIds.nextLessonDayId);
         }
     };
 
     const goToPreviousDay = () => {
-        if (currentLessonDayId && lessonData) {
-            debugger;
-            // your logic to find the previous lessonDayId
-            // Update the currentLessonDayId and currentDayIndex accordingly
+        const surroundingLessonDayIds = getSurroundingLessonDayIds();
+        if (
+            surroundingLessonDayIds &&
+            surroundingLessonDayIds.previousLessonDayId
+        ) {
+            setCurrentLessonDayId(surroundingLessonDayIds.previousLessonDayId);
+        }
+    };
+
+    const getSurroundingLessonDayIds = () => {
+        if (lessonData) {
+            const currentStudy = lessonData.data.studies.find((study) =>
+                study.lessons.some((lesson) =>
+                    lesson.lessonDays.some(
+                        (day) => day.lessonDayId === currentLessonDayId
+                    )
+                )
+            );
+            const currentLesson = currentStudy?.lessons.find((lesson) =>
+                lesson.lessonDays.some(
+                    (day) => day.lessonDayId === currentLessonDayId
+                )
+            );
+
+            // we want to get the previous lesson id (for the lecture and notes).
+            // We can do this by getting the index of the current lesson and subtracting 1,
+            // then getting the lesson id at that index.
+
+            const currentLessonIndex = currentStudy?.lessons.findIndex(
+                (lesson) => lesson.lessonId === currentLessonId
+            );
+            const previousLessonId =
+                currentLessonIndex && currentLessonIndex > 0
+                    ? currentStudy?.lessons[currentLessonIndex! - 1]?.lessonId
+                    : undefined;
+
+            const currentLessonDayIndex = currentLesson?.lessonDays.findIndex(
+                (day) => day.lessonDayId === currentLessonDayId
+            );
+
+            const nextLessonDayId =
+                currentLessonDayIndex !== undefined &&
+                currentLesson?.lessonDays.length &&
+                currentLessonDayIndex < currentLesson?.lessonDays.length - 1
+                    ? currentLesson?.lessonDays[currentLessonDayIndex! + 1]
+                          ?.lessonDayId
+                    : undefined;
+
+            const previousLessonDayId =
+                currentLessonDayIndex !== undefined && currentLessonDayIndex
+                    ? currentLesson?.lessonDays[currentLessonDayIndex! - 1]
+                          ?.lessonDayId
+                    : undefined;
+
+            return {
+                currentLesson: currentLesson,
+                previousLessonId: previousLessonId,
+                nextLessonDayId: nextLessonDayId,
+                previousLessonDayId: previousLessonDayId,
+            };
         }
     };
 
@@ -124,121 +182,79 @@ const LessonContainer: React.FC = () => {
                     {currentLessonDayId &&
                         lessonData &&
                         (() => {
-                            const currentStudy = lessonData.data.studies.find(
-                                (study) =>
-                                    study.lessons.some((lesson) =>
-                                        lesson.lessonDays.some(
+                            const surroundingLessonDayIds =
+                                getSurroundingLessonDayIds();
+                            if (surroundingLessonDayIds) {
+                                return (
+                                    <React.Fragment>
+                                        {
+                                            <div id="lesson-title">
+                                                <h1>
+                                                    {
+                                                        surroundingLessonDayIds
+                                                            .currentLesson
+                                                            ?.lessonTranslations[0]
+                                                            .title
+                                                    }
+                                                </h1>
+                                                <h3>
+                                                    {
+                                                        surroundingLessonDayIds
+                                                            .currentLesson
+                                                            ?.lessonTranslations[0]
+                                                            .scripture
+                                                    }
+                                                </h3>
+                                            </div>
+                                        }
+                                        {surroundingLessonDayIds.currentLesson?.lessonDays.map(
                                             (day) =>
-                                                day.lessonDayId ===
-                                                currentLessonDayId
-                                        )
-                                    )
-                            );
-                            const currentLesson = currentStudy?.lessons.find(
-                                (lesson) =>
-                                    lesson.lessonDays.some(
-                                        (day) =>
-                                            day.lessonDayId ===
-                                            currentLessonDayId
-                                    )
-                            );
-
-                            // we want to get the previous lesson id (for the lecture and notes).
-                            // We can do this by getting the index of the current lesson and subtracting 1,
-                            // then getting the lesson id at that index.
-
-                            const currentLessonIndex =
-                                currentStudy?.lessons.findIndex(
-                                    (lesson) =>
-                                        lesson.lessonId === currentLessonId
-                                );
-                            const previousLessonId =
-                                currentLessonIndex && currentLessonIndex > 0
-                                    ? currentStudy?.lessons[
-                                          currentLessonIndex! - 1
-                                      ]?.lessonId
-                                    : undefined;
-
-                            const currentLessonDayIndex =
-                                currentLesson?.lessonDays.findIndex(
-                                    (day) =>
-                                        day.lessonDayId === currentLessonDayId
-                                );
-
-                            const nextLessonDayId =
-                                currentLessonDayIndex !== undefined &&
-                                currentLesson?.lessonDays.length &&
-                                currentLessonDayIndex <
-                                    currentLesson?.lessonDays.length - 1
-                                    ? currentLesson?.lessonDays[
-                                          currentLessonDayIndex! + 1
-                                      ]?.lessonDayId
-                                    : undefined;
-
-                            const previousLessonDayId =
-                                currentLessonDayIndex !== undefined &&
-                                currentLessonDayIndex
-                                    ? currentLesson?.lessonDays[
-                                          currentLessonDayIndex! - 1
-                                      ]?.lessonDayId
-                                    : undefined;
-
-                            return (
-                                <React.Fragment>
-                                    {
-                                        <div id="lesson-title">
-                                            <h1>
-                                                {
-                                                    currentLesson
-                                                        ?.lessonTranslations[0]
-                                                        .title
-                                                }
-                                            </h1>
-                                            <h3>
-                                                {
-                                                    currentLesson
-                                                        ?.lessonTranslations[0]
-                                                        .scripture
-                                                }
-                                            </h3>
-                                        </div>
-                                    }
-                                    {currentLesson?.lessonDays.map(
-                                        (day) =>
-                                            (settings.settings.fullLessonMode ||
-                                                day.lessonDayId ===
-                                                    currentLessonDayId) && (
-                                                <div key={day.lessonDayId}>
-                                                    <LessonAreaComponent
-                                                        key={day.lessonDayId}
-                                                        previousLessonId={
-                                                            previousLessonId
-                                                        }
-                                                        lessonDay={day}
-                                                        answersData={
-                                                            answersData
-                                                        }
-                                                        scripturesData={
-                                                            scripturesData
-                                                        }
-                                                    />
-                                                </div>
-                                            )
-                                    )}
-                                    <div className="lesson-prev-next">
-                                        {previousLessonDayId && (
-                                            <button onClick={goToPreviousDay}>
-                                                Previous Day
-                                            </button>
+                                                (settings.settings
+                                                    .fullLessonMode ||
+                                                    day.lessonDayId ===
+                                                        currentLessonDayId) && (
+                                                    <div key={day.lessonDayId}>
+                                                        <LessonAreaComponent
+                                                            key={
+                                                                day.lessonDayId
+                                                            }
+                                                            previousLessonId={
+                                                                surroundingLessonDayIds.previousLessonId
+                                                            }
+                                                            lessonDay={day}
+                                                            answersData={
+                                                                answersData
+                                                            }
+                                                            scripturesData={
+                                                                scripturesData
+                                                            }
+                                                        />
+                                                    </div>
+                                                )
                                         )}
-                                        {nextLessonDayId && (
-                                            <button onClick={goToNextDay}>
-                                                Next Day
-                                            </button>
+                                        {!settings.settings.fullLessonMode && (
+                                            <div className="lesson-prev-next">
+                                                {surroundingLessonDayIds.previousLessonDayId && (
+                                                    <button
+                                                        onClick={
+                                                            goToPreviousDay
+                                                        }
+                                                    >
+                                                        Previous Day
+                                                    </button>
+                                                )}
+                                                {surroundingLessonDayIds.nextLessonDayId && (
+                                                    <button
+                                                        onClick={goToNextDay}
+                                                    >
+                                                        Next Day
+                                                    </button>
+                                                )}
+                                            </div>
                                         )}
-                                    </div>
-                                </React.Fragment>
-                            );
+                                    </React.Fragment>
+                                );
+                            }
                         })()}
                 </div>
             </div>
