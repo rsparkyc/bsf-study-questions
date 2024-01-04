@@ -86,7 +86,7 @@
     width: 100%;
 }
 
-.login-container button, .content-area button, .login-input-container button {
+button {
     min-width: 100px;
     padding: 5px 15px;
 }
