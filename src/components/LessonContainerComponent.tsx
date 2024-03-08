@@ -43,7 +43,6 @@ const LessonContainer: React.FC = () => {
     const settings = useContext(SettingsContext);
 
     const handleAnswerChange = (newAnswerData: AnswersResponse) => {
-        debugger;
         setAnswersData(newAnswerData);
     };
 
@@ -71,7 +70,6 @@ const LessonContainer: React.FC = () => {
                     ]);
 
                 setLessonData(lessonsResponse);
-                debugger;
                 setAnswersData(answersData);
                 setScripturesData(scripturesData);
 
