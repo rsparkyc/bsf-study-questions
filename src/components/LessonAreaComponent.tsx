@@ -24,6 +24,7 @@ interface LessonDayProps {
     previousLessonId: number | undefined;
     answersData: AnswersResponse | undefined;
     scripturesData: AllScripturesResponse | undefined;
+    onAnswerChange: (newAnswerData: AnswersResponse) => void;
 }
 
 const LessonAreaComponent: React.FC<LessonDayProps> = ({
@@ -31,6 +32,7 @@ const LessonAreaComponent: React.FC<LessonDayProps> = ({
     previousLessonId,
     answersData,
     scripturesData,
+    onAnswerChange,
 }) => {
     const settings = useContext(SettingsContext);
 
@@ -56,7 +58,10 @@ const LessonAreaComponent: React.FC<LessonDayProps> = ({
                 if (ans) {
                     ans.answerText = answerText;
                 }
+                const newAnswerData = { ...answersData };
+                onAnswerChange(newAnswerData);
             }
+
             const saveRequest = new SaveQuestionRequest(
                 AuthContextHolder.getAuthContext(),
                 questionId,

@@ -42,6 +42,11 @@ const LessonContainer: React.FC = () => {
 
     const settings = useContext(SettingsContext);
 
+    const handleAnswerChange = (newAnswerData: AnswersResponse) => {
+        debugger;
+        setAnswersData(newAnswerData);
+    };
+
     useEffect(() => {
         // Fetch your API data here and set it to the state
         async function fetchData() {
@@ -66,6 +71,7 @@ const LessonContainer: React.FC = () => {
                     ]);
 
                 setLessonData(lessonsResponse);
+                debugger;
                 setAnswersData(answersData);
                 setScripturesData(scripturesData);
 
@@ -180,6 +186,9 @@ const LessonContainer: React.FC = () => {
                                                         }
                                                         scripturesData={
                                                             scripturesData
+                                                        }
+                                                        onAnswerChange={
+                                                            handleAnswerChange
                                                         }
                                                     />
                                                 </div>
