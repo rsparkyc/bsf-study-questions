@@ -15,7 +15,7 @@ interface LeftNavProps {
     initialSelectedLessonDayId?: number;
 }
 
-const LeftNav: React.FC<LeftNavProps> = ({ 
+const LeftNav: React.FC<LeftNavProps> = ({
     data,
     setCurrentStudyId,
     setCurrentLessonId,
@@ -35,7 +35,7 @@ const LeftNav: React.FC<LeftNavProps> = ({
     }
 
     const toggleStudy = (studyId: number) => {
-        setExpandedStudyId(prev => 
+        setExpandedStudyId(prev =>
             prev === studyId ? null : studyId
         );
         localStorage.setItem('currentStudyId', studyId.toString());
@@ -43,7 +43,7 @@ const LeftNav: React.FC<LeftNavProps> = ({
     };
 
     const toggleLesson = (lessonId: number) => {
-        setExpandedLessonId(prev => 
+        setExpandedLessonId(prev =>
             prev === lessonId ? null : lessonId
         );
         localStorage.setItem('currentLessonId', lessonId.toString());
@@ -70,7 +70,7 @@ const LeftNav: React.FC<LeftNavProps> = ({
         <div className="left-nav">
             {[...data.data.studies].reverse().map((study: Study) => (
                 <div key={study.studyId} className={'study-nav expandable-nav' + (expandedStudyId === study.studyId ? ' selected-nav' : '')}>
-                    <button 
+                    <button
                         className="href-button"
                         aria-expanded={expandedStudyId === study.studyId}
                         onClick={() => toggleStudy(study.studyId)}>
@@ -78,15 +78,15 @@ const LeftNav: React.FC<LeftNavProps> = ({
                     </button>
                     {expandedStudyId === study.studyId && study.lessons.map((lesson: Lesson) => (
                         <div key={lesson.lessonId} className={'lesson-nav' + (settings.settings.fullLessonMode ? '': ' expandable-nav') + (expandedLessonId === lesson.lessonId ? ' selected-nav' : '')}>
-                            <button 
+                            <button
                                 className="href-button"
                                 aria-expanded={expandedLessonId === lesson.lessonId}
                                 onClick={() => toggleLesson(lesson.lessonId)}>
-                                {lesson.title}
+                                {lesson.title || lesson.lessonTranslations[0].scripture}
                             </button>
                             {!settings.settings.fullLessonMode && expandedLessonId === lesson.lessonId && lesson.lessonDays.map((day) => (
                                 <div key={day.lessonDayId} className={'day-nav' + (selectedLessonDayId === day.lessonDayId ? ' selected-nav' : '') }>
-                                    <button 
+                                    <button
                                         className="href-button"
                                         onClick={() => toggleLessonDay(day.lessonDayId)}>
                                         Day {day.dayOfWeek}
