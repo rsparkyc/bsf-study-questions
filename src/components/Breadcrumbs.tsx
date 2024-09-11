@@ -1,7 +1,7 @@
-import React, { useContext } from 'react';
+import React, { useContext } from "react";
 
-import AllLessonsResponse from '../api/bsf/response/AllLessonsResponse';
-import SettingsContext from '../context/SettingsContext';
+import AllLessonsResponse from "../api/bsf/response/AllLessonsResponse";
+import SettingsContext from "../context/SettingsContext";
 
 interface BreadcrumbsProps {
     studyId?: number;
@@ -15,63 +15,74 @@ interface BreadcrumbsProps {
     };
 }
 
-const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ studyId, lessonId, lessonDayId, data, setData }) => {
+const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
+    studyId,
+    lessonId,
+    lessonDayId,
+    data,
+    setData,
+}) => {
     const settings = useContext(SettingsContext);
 
     if (!data) {
         return <div></div>;
     }
 
-    const study = data.data.studies.find(study => study.studyId === studyId);
-    const lesson = study?.lessons.find(lesson => lesson.lessonId === lessonId);
-    const lessonDay = lesson?.lessonDays.find(day => day.lessonDayId === lessonDayId);
+    const study = data.data.studies.find((study) => study.studyId === studyId);
+    const lesson = study?.lessons.find(
+        (lesson) => lesson.lessonId === lessonId
+    );
+    const lessonDay = lesson?.lessonDays.find(
+        (day) => day.lessonDayId === lessonDayId
+    );
 
     return (
         <div>
-            <button 
+            <button
                 className="href-button"
                 onClick={() => {
                     setData.setCurrentStudyId(undefined);
                     setData.setCurrentLessonId(undefined);
                     setData.setCurrentLessonDayId(undefined);
-                }}>
+                }}
+            >
                 Studies
-            </button> &gt;
-
+            </button>{" "}
+            &gt;
             {study && (
                 <>
-                    <button 
+                    <button
                         className="href-button"
                         onClick={() => {
                             setData.setCurrentLessonId(undefined);
                             setData.setCurrentLessonDayId(undefined);
-                        }}>
+                        }}
+                    >
                         {study.displayName}
-                    </button> &gt;
+                    </button>{" "}
+                    &gt;
                 </>
             )}
-
             {lesson && (
                 <>
-                    <button 
+                    <button
                         className="href-button"
                         onClick={() => {
                             setData.setCurrentLessonDayId(undefined);
-                        }}>
-                        {lesson.title}
-                    </button> 
-                    {!settings.settings.fullLessonMode && ('>')}
+                        }}
+                    >
+                        {lesson.title || lesson.lessonTranslations[0].scripture}
+                    </button>
+                    {!settings.settings.fullLessonMode && ">"}
                 </>
             )}
-
             {lessonDay && !settings.settings.fullLessonMode && (
                 <button className="href-button">
                     Day {lessonDay.dayOfWeek}
                 </button>
             )}
-
         </div>
     );
-}
+};
 
 export default Breadcrumbs;
