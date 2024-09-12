@@ -115,28 +115,41 @@ const LectureAndNotesComponent: React.FC<LectureAndNotesProps> = ({
     return (
         <div className="lecture-and-notes-area">
             <h3>Materials</h3>
-            {materials.map((material) => (
-                <div key={material.materialId}>
-                    <a href={material.url} target="_blank" rel="noreferrer">
-                        {material.name}
-                    </a>
-                    {material.materialType === MaterialType.HTML_NOTES && (
-                        <iframe
-                            src={material.url}
-                            title={material.name}
-                            width="100%"
-                            height="500px"
-                        ></iframe>
-                    )}
-                    {material.materialType === MaterialType.AUDIO_NOTES && (
-                        <div className="notes-audio-area">
-                            <audio controls>
-                                <source src={material.url} type="audio/mpeg" />
-                            </audio>
-                        </div>
-                    )}
-                </div>
-            ))}
+            {materials.map((material) => {
+                // Only use proxy URL for HTML_NOTES
+                const htmlProxyUrl =
+                    material.materialType === MaterialType.HTML_NOTES
+                        ? `https://ajxqcsfpbtppe7rhsqwkmbrdx40phvnl.lambda-url.us-east-1.on.aws/?contentType=${encodeURIComponent(
+                              "text/html"
+                          )}&fileUrl=${encodeURIComponent(material.url)}`
+                        : material.url;
+
+                return (
+                    <div key={material.materialId}>
+                        <a href={material.url} target="_blank" rel="noreferrer">
+                            {material.name}
+                        </a>
+                        {material.materialType === MaterialType.HTML_NOTES && (
+                            <iframe
+                                src={htmlProxyUrl}
+                                title={material.name}
+                                width="100%"
+                                height="500px"
+                            ></iframe>
+                        )}
+                        {material.materialType === MaterialType.AUDIO_NOTES && (
+                            <div className="notes-audio-area">
+                                <audio controls>
+                                    <source
+                                        src={material.url}
+                                        type="audio/mpeg"
+                                    />
+                                </audio>
+                            </div>
+                        )}
+                    </div>
+                );
+            })}
         </div>
     );
 };
