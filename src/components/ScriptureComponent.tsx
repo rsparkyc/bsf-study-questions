@@ -1,8 +1,9 @@
-import './ScriptureComponent.css';
+import "./ScriptureComponent.css";
 
-import { PopoverComponent } from './PopoverComponent';
-import React from 'react';
+import { PopoverComponent } from "./PopoverComponent";
+import React from "react";
 import { ScriptureData } from "../api/bsf/response/AllScripturesResponse";
+import { debug } from "console";
 import { useState } from "react";
 
 interface ScriptureProps {
@@ -10,7 +11,10 @@ interface ScriptureProps {
     verseReferences: string;
 }
 
-const Scripture: React.FC<ScriptureProps> = ({ scriptureData, verseReferences}) => {
+const Scripture: React.FC<ScriptureProps> = ({
+    scriptureData,
+    verseReferences,
+}) => {
     const [isExpanded, setIsExpanded] = useState(false);
 
     const toggleScriptureText = () => {
@@ -18,12 +22,16 @@ const Scripture: React.FC<ScriptureProps> = ({ scriptureData, verseReferences}) 
     };
 
     function unescapeString(s: string): string {
-        // eslint-disable-next-line no-new-func
-        return new Function(`return ${s};`)();
+        if (s.startsWith('"')) {
+            // eslint-disable-next-line no-new-func
+            return new Function(`return ${s};`)();
+        }
+        return s;
     }
 
-
-    const transformScriptureContent = (nodes: ChildNode[]): React.ReactNode[] => {
+    const transformScriptureContent = (
+        nodes: ChildNode[]
+    ): React.ReactNode[] => {
         const result: React.ReactNode[] = [];
 
         nodes.forEach((node, index) => {
@@ -33,21 +41,27 @@ const Scripture: React.FC<ScriptureProps> = ({ scriptureData, verseReferences}) 
 
                 const attributes: { [key: string]: any } = {};
 
-                Array.from(elem.attributes).forEach(attr => {
-                    if (attr.name === 'class') {
+                Array.from(elem.attributes).forEach((attr) => {
+                    if (attr.name === "class") {
                         attributes.className = attr.value;
                     } else {
                         attributes[attr.name] = attr.value;
                     }
                 });
 
-                if (elem.getAttribute('data-caller') === '+') {
+                if (elem.getAttribute("data-caller") === "+") {
                     const content = elem.innerHTML;
                     result.push(<PopoverComponent content={content} />);
                 } else {
                     // Recursively process child nodes of this element
-                    const children = transformScriptureContent(Array.from(elem.childNodes));
-                    const element = React.createElement(tagName, { ...attributes, key: index }, ...children);
+                    const children = transformScriptureContent(
+                        Array.from(elem.childNodes)
+                    );
+                    const element = React.createElement(
+                        tagName,
+                        { ...attributes, key: index },
+                        ...children
+                    );
                     result.push(element);
                 }
             } else {
@@ -58,22 +72,33 @@ const Scripture: React.FC<ScriptureProps> = ({ scriptureData, verseReferences}) 
         return result;
     };
 
-    const parsedHTML = new DOMParser().parseFromString(unescapeString(scriptureData.htmlContent), 'text/html');
-    const transformedContent = transformScriptureContent(Array.from(parsedHTML.body.childNodes));
+    var unescapedScripture = "";
+    try {
+        unescapedScripture = unescapeString(scriptureData.htmlContent);
+    } catch (error) {
+        console.log("Error unescaping scripture: ", error);
+        console.log("Scripture data: ", scriptureData);
+    }
+
+    const parsedHTML = new DOMParser().parseFromString(
+        unescapedScripture,
+        "text/html"
+    );
+
+    const transformedContent = transformScriptureContent(
+        Array.from(parsedHTML.body.childNodes)
+    );
 
     return (
         <div className="scripture">
             <button onClick={toggleScriptureText}>
                 {scriptureData.name} {verseReferences}
             </button>
-            {isExpanded && 
-                <div className="expanded-scripture">
-                    {transformedContent}
-                </div>
-            }
+            {isExpanded && (
+                <div className="expanded-scripture">{transformedContent}</div>
+            )}
         </div>
-
     );
-}
+};
 
 export default Scripture;
