@@ -3,7 +3,6 @@ import "./ScriptureComponent.css";
 import { PopoverComponent } from "./PopoverComponent";
 import React from "react";
 import { ScriptureData } from "../api/bsf/response/AllScripturesResponse";
-import { debug } from "console";
 import { useState } from "react";
 
 interface ScriptureProps {
