@@ -211,7 +211,7 @@ const LessonAreaComponent: React.FC<LessonDayProps> = ({
             max_tokens: existingTextLength + settings.settings.typeaheadLength,
             n: 1,
             stop: ["\n", "."],
-            model: "gpt-4-1106-preview",
+            model: "gpt-4o",
         };
 
         return config;
