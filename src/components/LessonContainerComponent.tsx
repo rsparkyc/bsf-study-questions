@@ -46,6 +46,21 @@ const LessonContainer: React.FC = () => {
         setAnswersData(newAnswerData);
     };
 
+    const postProcessLessonResponse = (response: AllLessonsResponse) => {
+        for (const study of response.data.studies) {
+            for (const lesson of study.lessons) {
+                for (const lessonDay of lesson.lessonDays) {
+                    const fullTitle = lessonDay.lessonDayTranslations[0].title;
+                    // split on newline, and save the first part as the mainTitle and the rest as the subTitle
+                    const splitTitle = fullTitle.split("\n");
+                    lessonDay.lessonDayTranslations[0].mainTitle =
+                        splitTitle[0];
+                    lessonDay.lessonDayTranslations[0].subTitle = splitTitle[1];
+                }
+            }
+        }
+    };
+
     useEffect(() => {
         // Fetch your API data here and set it to the state
         async function fetchData() {
@@ -68,6 +83,8 @@ const LessonContainer: React.FC = () => {
                         answersPromise,
                         allScripturesPromise,
                     ]);
+
+                postProcessLessonResponse(lessonsResponse);
 
                 setLessonData(lessonsResponse);
                 setAnswersData(answersData);

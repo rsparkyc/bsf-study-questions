@@ -219,8 +219,8 @@ const LessonAreaComponent: React.FC<LessonDayProps> = ({
 
     // counts the occurrences of spaces, periods, and commas in phrase to calculate token length:
     const tokenCount = (phrase: string): number => {
-        // uses a regex and finds the number of matches
-        return phrase.match(/[\s.,]/g || [])?.length || 0;
+        const matches = phrase.match(/[\s.,]/g);
+        return matches ? matches.length : 0;
     };
 
     const generateSuggestions = async (
@@ -287,7 +287,8 @@ const LessonAreaComponent: React.FC<LessonDayProps> = ({
     return (
         <div className="lesson-area">
             {/* Display Lesson Day Title */}
-            <h2>{lessonDay.lessonDayTranslations[0].title}</h2>
+            <h2>{lessonDay.lessonDayTranslations[0].mainTitle}</h2>
+            <p>{lessonDay.lessonDayTranslations[0].subTitle}</p>
             {/* Display Scriptures of the Day, but only if it has any */}
             {lessonDay.lessonDayScriptures.length > 0 && (
                 <div className="scriptures">

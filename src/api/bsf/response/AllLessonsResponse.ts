@@ -45,6 +45,8 @@ export interface LessonDayQuestion {
 interface LessonDayTranslation {
     languageId: number;
     title: string;
+    mainTitle: string;
+    subTitle: string;
 }
 
 export interface LessonDay {
