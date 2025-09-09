@@ -15,6 +15,7 @@ import LessonAreaComponent from "./LessonAreaComponent";
 import SettingsContext from "../context/SettingsContext";
 
 const LessonContainer: React.FC = () => {
+    console.log("🎯 LessonContainer: Component rendering");
     const [lessonData, setLessonData] = useState<
         AllLessonsResponse | undefined
     >();
@@ -184,31 +185,38 @@ const LessonContainer: React.FC = () => {
                                             </h3>
                                         </div>
                                     }
-                                    {currentLesson?.lessonDays.map(
-                                        (day) =>
-                                            (settings.settings.fullLessonMode ||
-                                                day.lessonDayId ===
-                                                    currentLessonDayId) && (
-                                                <div key={day.lessonDayId}>
-                                                    <LessonAreaComponent
-                                                        key={day.lessonDayId}
-                                                        previousLessonId={
-                                                            previousLessonId
-                                                        }
-                                                        lessonDay={day}
-                                                        answersData={
-                                                            answersData
-                                                        }
-                                                        scripturesData={
-                                                            scripturesData
-                                                        }
-                                                        onAnswerChange={
-                                                            handleAnswerChange
-                                                        }
-                                                    />
-                                                </div>
-                                            )
-                                    )}
+                                    {currentLesson?.lessonDays
+                                        .sort(
+                                            (a, b) => a.dayOfWeek - b.dayOfWeek
+                                        )
+                                        .map(
+                                            (day) =>
+                                                (settings.settings
+                                                    .fullLessonMode ||
+                                                    day.lessonDayId ===
+                                                        currentLessonDayId) && (
+                                                    <div key={day.lessonDayId}>
+                                                        <LessonAreaComponent
+                                                            key={
+                                                                day.lessonDayId
+                                                            }
+                                                            previousLessonId={
+                                                                previousLessonId
+                                                            }
+                                                            lessonDay={day}
+                                                            answersData={
+                                                                answersData
+                                                            }
+                                                            scripturesData={
+                                                                scripturesData
+                                                            }
+                                                            onAnswerChange={
+                                                                handleAnswerChange
+                                                            }
+                                                        />
+                                                    </div>
+                                                )
+                                        )}
                                 </React.Fragment>
                             );
                         })()}
