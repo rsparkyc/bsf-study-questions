@@ -9,9 +9,9 @@ import AllScripturesResponse from "../api/bsf/response/AllScripturesResponse";
 import { AnswersRequest } from "../api/bsf/requests/AnswersRequest";
 import AnswersResponse from "../api/bsf/response/AnswersResponse";
 import { AuthContextHolder } from "../api/bsf/AuthContext";
-import Breadcrumbs from "./Breadcrumbs";
 import LeftNav from "./LeftNav";
 import LessonAreaComponent from "./LessonAreaComponent";
+import ModernLeftNav from "./ModernLeftNav";
 import SettingsContext from "../context/SettingsContext";
 
 const LessonContainer: React.FC = () => {
@@ -104,27 +104,28 @@ const LessonContainer: React.FC = () => {
 
     return (
         <div className="lesson-container">
-            <Breadcrumbs
-                studyId={currentStudyId}
-                lessonId={currentLessonId}
-                lessonDayId={currentLessonDayId}
-                setData={{
-                    setCurrentStudyId,
-                    setCurrentLessonId,
-                    setCurrentLessonDayId,
-                }}
-                data={lessonData}
-            />
             <div className="content-row">
-                <LeftNav
-                    data={lessonData}
-                    setCurrentStudyId={setCurrentStudyId}
-                    setCurrentLessonId={setCurrentLessonId}
-                    setCurrentLessonDayId={setCurrentLessonDayId}
-                    initialExpandedStudyId={Number(savedStudyId)}
-                    initialExpandedLessonId={Number(savedLessonId)}
-                    initialSelectedLessonDayId={Number(savedLessonDayId)}
-                />
+                {settings.settings.modernNavigation ? (
+                    <ModernLeftNav
+                        data={lessonData}
+                        setCurrentStudyId={setCurrentStudyId}
+                        setCurrentLessonId={setCurrentLessonId}
+                        setCurrentLessonDayId={setCurrentLessonDayId}
+                        currentStudyId={currentStudyId}
+                        currentLessonId={currentLessonId}
+                        currentLessonDayId={currentLessonDayId}
+                    />
+                ) : (
+                    <LeftNav
+                        data={lessonData}
+                        setCurrentStudyId={setCurrentStudyId}
+                        setCurrentLessonId={setCurrentLessonId}
+                        setCurrentLessonDayId={setCurrentLessonDayId}
+                        initialExpandedStudyId={Number(savedStudyId)}
+                        initialExpandedLessonId={Number(savedLessonId)}
+                        initialSelectedLessonDayId={Number(savedLessonDayId)}
+                    />
+                )}
 
                 <div className="lesson-area-v">
                     {currentLessonDayId &&

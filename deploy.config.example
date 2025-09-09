@@ -1,0 +1,17 @@
+# BSF Study Questions Deployment Configuration
+# Copy this file to deploy.config and update with your values
+
+# AWS Configuration
+AWS_PROFILE=staticWebsites
+
+# S3 Bucket Configuration
+# Leave empty to auto-detect, or set your bucket name
+BUCKET_NAME=
+
+# CloudFront Distribution Configuration
+# Leave empty to auto-detect, or set your distribution ID
+CLOUDFRONT_DISTRIBUTION_ID=
+
+# Example values (replace with your actual values):
+# BUCKET_NAME=bsf-study-questions-static
+# CLOUDFRONT_DISTRIBUTION_ID=E1234567890ABC

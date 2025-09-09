@@ -55,6 +55,18 @@ const SettingsComponent: React.FC = () => {
                         <label>
                             <input
                                 type="checkbox"
+                                checked={settings.modernNavigation}
+                                onChange={handleCheckboxChange(
+                                    "modernNavigation"
+                                )}
+                            />
+                            Modern Navigation
+                        </label>
+                    </div>
+                    <div className="settings-content">
+                        <label>
+                            <input
+                                type="checkbox"
                                 checked={settings.typeaheadSuggestions}
                                 onChange={handleCheckboxChange(
                                     "typeaheadSuggestions"

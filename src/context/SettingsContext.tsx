@@ -4,13 +4,15 @@ export type SettingName =
     | "fullLessonMode"
     | "typeaheadSuggestions"
     | "typeaheadApiKey"
-    | "typeaheadLength";
+    | "typeaheadLength"
+    | "modernNavigation";
 
 export interface Settings {
     fullLessonMode: boolean;
     typeaheadSuggestions: boolean;
     typeaheadApiKey: string;
     typeaheadLength: number;
+    modernNavigation: boolean;
 }
 
 export interface SettingsContextType {
@@ -23,6 +25,7 @@ export const defaultSettings: Settings = {
     typeaheadSuggestions: false,
     typeaheadApiKey: "",
     typeaheadLength: 20,
+    modernNavigation: true,
 };
 
 export const defaultSettingsContext: SettingsContextType = {

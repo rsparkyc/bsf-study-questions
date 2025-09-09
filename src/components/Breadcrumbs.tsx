@@ -37,7 +37,7 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
     );
 
     return (
-        <div>
+        <div className="breadcrumbs">
             <button
                 className="href-button"
                 onClick={() => {
@@ -47,8 +47,8 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
                 }}
             >
                 Studies
-            </button>{" "}
-            &gt;
+            </button>
+            <span className="breadcrumb-separator">›</span>
             {study && (
                 <>
                     <button
@@ -59,8 +59,8 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
                         }}
                     >
                         {study.displayName}
-                    </button>{" "}
-                    &gt;
+                    </button>
+                    <span className="breadcrumb-separator">›</span>
                 </>
             )}
             {lesson && (
@@ -73,7 +73,9 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
                     >
                         {lesson.title || lesson.lessonTranslations[0].scripture}
                     </button>
-                    {!settings.settings.fullLessonMode && ">"}
+                    {!settings.settings.fullLessonMode && (
+                        <span className="breadcrumb-separator">›</span>
+                    )}
                 </>
             )}
             {lessonDay && !settings.settings.fullLessonMode && (

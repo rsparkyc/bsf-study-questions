@@ -1,0 +1,389 @@
+/* Modern Left Navigation Styles */
+.modern-nav {
+    width: 320px;
+    background: linear-gradient(135deg, #f1ccc0 0%, #e8b4a0 100%);
+    color: #5d4e37;
+    padding: 0;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(139, 111, 71, 0.15);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        sans-serif;
+    overflow-y: auto;
+    max-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Navigation Breadcrumbs */
+.nav-breadcrumbs {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 12px 20px;
+    border-radius: 12px 12px 0 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px;
+    font-size: 13px;
+}
+
+.breadcrumb-btn {
+    background: none;
+    border: none;
+    color: #8b6f47;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.breadcrumb-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    color: #5d4e37;
+}
+
+.breadcrumb-separator {
+    color: #8b6f47;
+    margin: 0 2px;
+    font-weight: 500;
+}
+
+.breadcrumb-current {
+    color: #5d4e37;
+    font-weight: 500;
+    padding: 4px 8px;
+}
+
+/* Loading State */
+.nav-loading {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 20px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.loading-spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top: 2px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Current Study Header */
+.current-study-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+    padding: 20px 20px 16px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.study-info {
+    flex: 1;
+}
+
+.study-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0 0 4px 0;
+    color: #5d4e37;
+    line-height: 1.3;
+}
+
+.study-meta {
+    font-size: 14px;
+    color: #8b6f47;
+    margin: 0;
+}
+
+.study-toggle-btn {
+    background: rgba(255, 255, 255, 0.3);
+    border: none;
+    color: #5d4e37;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.study-toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.5);
+    transform: scale(1.05);
+}
+
+/* Section Titles */
+.section-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 16px 0;
+    color: #5d4e37;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Current Week Section */
+.current-week-section {
+    margin-bottom: 24px;
+    padding: 0 20px;
+}
+
+.week-lessons {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.lesson-card {
+    background: rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 8px;
+    padding: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(5px);
+}
+
+.lesson-card:hover {
+    background: rgba(255, 255, 255, 0.4);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(139, 111, 71, 0.2);
+}
+
+.lesson-card.active {
+    background: rgba(255, 255, 255, 0.5);
+    border-color: rgba(255, 255, 255, 0.6);
+    box-shadow: 0 4px 16px rgba(139, 111, 71, 0.3);
+}
+
+.lesson-number {
+    font-size: 12px;
+    font-weight: 600;
+    color: #8b6f47;
+    margin-bottom: 4px;
+}
+
+.lesson-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: #5d4e37;
+    line-height: 1.4;
+}
+
+.lesson-days {
+    display: flex;
+    gap: 4px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+}
+
+.day-btn {
+    background: rgba(255, 255, 255, 0.4);
+    border: none;
+    color: #5d4e37;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.day-btn:hover {
+    background: rgba(255, 255, 255, 0.6);
+}
+
+.day-btn.active {
+    background: rgba(255, 255, 255, 0.7);
+    font-weight: 600;
+}
+
+/* All Weeks Section */
+.all-weeks-section {
+    margin-bottom: 24px;
+    padding: 0 20px;
+}
+
+.weeks-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+}
+
+.week-card {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.2s ease;
+}
+
+.week-card:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.week-header {
+    width: 100%;
+    background: none;
+    border: none;
+    color: #5d4e37;
+    padding: 12px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s ease;
+}
+
+.week-header:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.week-title {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.week-range {
+    font-size: 12px;
+    color: #8b6f47;
+}
+
+.expand-icon {
+    font-size: 16px;
+    font-weight: bold;
+    color: #5d4e37;
+}
+
+.week-lessons-detail {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.lesson-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 2px;
+}
+
+.lesson-item:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.lesson-item.active {
+    background: rgba(255, 255, 255, 0.3);
+    font-weight: 500;
+}
+
+.lesson-item .lesson-number {
+    font-size: 11px;
+    font-weight: 600;
+    color: #8b6f47;
+    min-width: 24px;
+}
+
+.lesson-item .lesson-title {
+    font-size: 13px;
+    color: #5d4e37;
+    flex: 1;
+}
+
+/* Other Studies Section */
+.other-studies-section {
+    margin-bottom: 16px;
+    padding: 0 20px 20px 20px;
+}
+
+.other-studies {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.other-study-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 6px;
+    padding: 10px 12px;
+    color: #5d4e37;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.other-study-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateX(2px);
+}
+
+.study-name {
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.study-year {
+    font-size: 11px;
+    color: #8b6f47;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .modern-nav {
+        width: 100%;
+        max-width: 320px;
+        margin: 0 auto;
+    }
+
+    .weeks-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Scrollbar Styling */
+.modern-nav::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modern-nav::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+
+.modern-nav::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+}
+
+.modern-nav::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}

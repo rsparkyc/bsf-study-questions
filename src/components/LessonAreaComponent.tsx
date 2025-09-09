@@ -1,3 +1,5 @@
+import "./LessonAreaComponent.css";
+
 import {
     ConversationConfig,
     OpenAiCompletionRequest,
