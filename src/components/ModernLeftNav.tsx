@@ -111,10 +111,14 @@ const ModernLeftNav: React.FC<ModernLeftNavProps> = ({
         setCurrentLessonId(undefined as any);
         setCurrentLessonDayId(undefined as any);
         setExpandedWeek(null);
+        localStorage.setItem("currentStudyId", studyId.toString());
+        localStorage.removeItem("currentLessonId");
+        localStorage.removeItem("currentLessonDayId");
     };
 
     const handleLessonSelect = (lessonId: number) => {
         setCurrentLessonId(lessonId);
+        localStorage.setItem("currentLessonId", lessonId.toString());
         // Auto-select first day if in full lesson mode
         if (settings.settings.fullLessonMode) {
             const lesson = currentStudy?.lessons.find(
@@ -125,14 +129,20 @@ const ModernLeftNav: React.FC<ModernLeftNavProps> = ({
                     (a, b) => a.dayOfWeek - b.dayOfWeek
                 )[0];
                 setCurrentLessonDayId(firstDay.lessonDayId);
+                localStorage.setItem(
+                    "currentLessonDayId",
+                    firstDay.lessonDayId.toString()
+                );
             }
         } else {
             setCurrentLessonDayId(undefined as any);
+            localStorage.removeItem("currentLessonDayId");
         }
     };
 
     const handleDaySelect = (lessonDayId: number) => {
         setCurrentLessonDayId(lessonDayId);
+        localStorage.setItem("currentLessonDayId", lessonDayId.toString());
     };
 
     const toggleWeek = (weekNumber: number) => {
@@ -149,6 +159,9 @@ const ModernLeftNav: React.FC<ModernLeftNavProps> = ({
                         setCurrentStudyId(undefined as any);
                         setCurrentLessonId(undefined as any);
                         setCurrentLessonDayId(undefined as any);
+                        localStorage.removeItem("currentStudyId");
+                        localStorage.removeItem("currentLessonId");
+                        localStorage.removeItem("currentLessonDayId");
                     }}
                 >
                     Studies
@@ -161,6 +174,8 @@ const ModernLeftNav: React.FC<ModernLeftNavProps> = ({
                             onClick={() => {
                                 setCurrentLessonId(undefined as any);
                                 setCurrentLessonDayId(undefined as any);
+                                localStorage.removeItem("currentLessonId");
+                                localStorage.removeItem("currentLessonDayId");
                             }}
                         >
                             {currentStudy.displayName}
@@ -172,9 +187,10 @@ const ModernLeftNav: React.FC<ModernLeftNavProps> = ({
                         <span className="breadcrumb-separator">›</span>
                         <button
                             className="breadcrumb-btn"
-                            onClick={() =>
-                                setCurrentLessonDayId(undefined as any)
-                            }
+                            onClick={() => {
+                                setCurrentLessonDayId(undefined as any);
+                                localStorage.removeItem("currentLessonDayId");
+                            }}
                         >
                             {currentStudy.lessons.find(
                                 (l) => l.lessonId === currentLessonId
@@ -285,6 +301,10 @@ const ModernLeftNav: React.FC<ModernLeftNavProps> = ({
                                                             setCurrentLessonId(
                                                                 lesson.lessonId
                                                             );
+                                                            localStorage.setItem(
+                                                                "currentLessonId",
+                                                                lesson.lessonId.toString()
+                                                            );
                                                             handleDaySelect(
                                                                 day.lessonDayId
                                                             );
@@ -372,6 +392,10 @@ const ModernLeftNav: React.FC<ModernLeftNavProps> = ({
                                                                             e.stopPropagation();
                                                                             setCurrentLessonId(
                                                                                 lesson.lessonId
+                                                                            );
+                                                                            localStorage.setItem(
+                                                                                "currentLessonId",
+                                                                                lesson.lessonId.toString()
                                                                             );
                                                                             handleDaySelect(
                                                                                 day.lessonDayId

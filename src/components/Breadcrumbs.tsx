@@ -44,6 +44,9 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
                     setData.setCurrentStudyId(undefined);
                     setData.setCurrentLessonId(undefined);
                     setData.setCurrentLessonDayId(undefined);
+                    localStorage.removeItem("currentStudyId");
+                    localStorage.removeItem("currentLessonId");
+                    localStorage.removeItem("currentLessonDayId");
                 }}
             >
                 Studies
@@ -56,6 +59,8 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
                         onClick={() => {
                             setData.setCurrentLessonId(undefined);
                             setData.setCurrentLessonDayId(undefined);
+                            localStorage.removeItem("currentLessonId");
+                            localStorage.removeItem("currentLessonDayId");
                         }}
                     >
                         {study.displayName}
@@ -69,6 +74,7 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
                         className="href-button"
                         onClick={() => {
                             setData.setCurrentLessonDayId(undefined);
+                            localStorage.removeItem("currentLessonDayId");
                         }}
                     >
                         {lesson.title || lesson.lessonTranslations[0].scripture}

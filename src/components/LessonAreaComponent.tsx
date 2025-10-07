@@ -81,8 +81,13 @@ const LessonAreaComponent: React.FC<LessonDayProps> = ({
     };
 
     const isPassageDiscovery = (question: LessonDayQuestion): boolean => {
-        return question?.lessonDayQuestionTranslations[0].questionText.startsWith(
-            "Passage Discovery"
+        return (
+            question?.lessonDayQuestionTranslations[0].questionText.startsWith(
+                "Passage Discovery"
+            ) ||
+            question?.lessonDayQuestionTranslations[0].questionText.startsWith(
+                "Homiletics"
+            )
         );
     };
 

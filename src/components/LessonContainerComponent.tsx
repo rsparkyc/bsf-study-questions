@@ -128,6 +128,45 @@ const LessonContainer: React.FC = () => {
                 )}
 
                 <div className="lesson-area-v">
+                    {!currentStudyId &&
+                        !currentLessonId &&
+                        !currentLessonDayId &&
+                        lessonData && (
+                            <div className="all-studies-view">
+                                <h1>Bible Study Fellowship</h1>
+                                <p>
+                                    Select a study from the navigation to begin.
+                                </p>
+                                <div className="studies-grid">
+                                    {lessonData.data.studies.map((study) => (
+                                        <div
+                                            key={study.studyId}
+                                            className="study-card"
+                                        >
+                                            <h3>{study.displayName}</h3>
+                                            <p>
+                                                {study.numberLessons} lessons •{" "}
+                                                {study.releaseYear}
+                                            </p>
+                                            <button
+                                                className="study-select-btn"
+                                                onClick={() => {
+                                                    setCurrentStudyId(
+                                                        study.studyId
+                                                    );
+                                                    localStorage.setItem(
+                                                        "currentStudyId",
+                                                        study.studyId.toString()
+                                                    );
+                                                }}
+                                            >
+                                                Select Study
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     {currentLessonDayId &&
                         lessonData &&
                         (() => {
