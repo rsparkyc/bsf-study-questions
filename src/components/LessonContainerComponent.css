@@ -14,10 +14,10 @@
 }
 
 .lesson-area {
-    flex-grow: 1;
+    flex: 1 1 auto;
     padding-left: 20px;
     max-width: none;
-    width: calc(100% - 340px);
+    width: 100%;
     padding-right: 20px;
     background: transparent;
 }
@@ -38,6 +38,8 @@
 
 .lesson-area-v {
     display: flex;
+    flex: 1 1 auto;
+    min-width: 0;
     flex-direction: column;
     margin-bottom: 50px;
 }
@@ -70,7 +72,7 @@
 
 @media (min-width: 1400px) {
     .lesson-area {
-        max-width: 1200px;
-        margin: 0 auto;
+        max-width: none;
+        margin: 0;
     }
 }

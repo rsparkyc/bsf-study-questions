@@ -149,33 +149,7 @@ export const TypeaheadTextarea: React.FC<Props> = ({
         }
     };
 
-    const resizeObserverRef = React.useRef<ResizeObserver | null>(null);
-    React.useEffect(() => {
-        if (mainTextareaRef.current && ghostTextareaRef.current) {
-            // Initialize the ResizeObserver
-            resizeObserverRef.current = new ResizeObserver(() => {
-                const mainTextareaStyle = window.getComputedStyle(
-                    mainTextareaRef.current!
-                );
-                if (ghostTextareaRef.current?.style) {
-                    ghostTextareaRef.current.style.width =
-                        mainTextareaStyle.width;
-                    ghostTextareaRef.current.style.height =
-                        mainTextareaStyle.height;
-                }
-            });
-
-            // Start observing the main textarea
-            resizeObserverRef.current.observe(mainTextareaRef.current);
-
-            // Cleanup
-            return () => {
-                if (resizeObserverRef.current) {
-                    resizeObserverRef.current.disconnect();
-                }
-            };
-        }
-    }, []);
+    // Rely on CSS for sizing overlay; no JS width/height syncing needed
 
     return (
         <div className="textarea-wrapper">

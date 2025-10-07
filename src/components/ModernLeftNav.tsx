@@ -38,17 +38,17 @@ const ModernLeftNav: React.FC<ModernLeftNavProps> = ({
 
     const settings = useContext(SettingsContext);
 
-    // Helper function to group lessons into weeks (6 lessons per week)
+    // Helper function to group lessons into weeks (week = lesson)
     const groupLessonsIntoWeeks = (lessons: Lesson[]): WeekData[] => {
         const weeks: WeekData[] = [];
-        for (let i = 0; i < lessons.length; i += 6) {
-            const weekLessons = lessons.slice(i, i + 6);
+        for (let i = 0; i < lessons.length; i++) {
+            const lesson = lessons[i];
+            if (!lesson) continue;
             weeks.push({
-                weekNumber: Math.floor(i / 6) + 1,
-                lessons: weekLessons,
-                startLesson: weekLessons[0]?.lessonNumber || 0,
-                endLesson:
-                    weekLessons[weekLessons.length - 1]?.lessonNumber || 0,
+                weekNumber: lesson.lessonNumber,
+                lessons: [lesson],
+                startLesson: lesson.lessonNumber,
+                endLesson: lesson.lessonNumber,
             });
         }
         return weeks;
@@ -236,11 +236,11 @@ const ModernLeftNav: React.FC<ModernLeftNavProps> = ({
                 </div>
             )}
 
-            {/* Current Week Quick Access */}
+            {/* Current Lesson Quick Access */}
             {currentWeekData && (
                 <div className="current-week-section">
                     <h3 className="section-title">
-                        Current Week {currentWeek}
+                        Current Lesson {currentWeek}
                     </h3>
                     <div className="week-lessons">
                         {currentWeekData.lessons.map((lesson) => (
@@ -282,6 +282,9 @@ const ModernLeftNav: React.FC<ModernLeftNavProps> = ({
                                                         }`}
                                                         onClick={(e) => {
                                                             e.stopPropagation();
+                                                            setCurrentLessonId(
+                                                                lesson.lessonId
+                                                            );
                                                             handleDaySelect(
                                                                 day.lessonDayId
                                                             );
@@ -298,10 +301,10 @@ const ModernLeftNav: React.FC<ModernLeftNavProps> = ({
                 </div>
             )}
 
-            {/* All Weeks Navigation */}
+            {/* All Lessons Navigation */}
             {currentStudy && (
                 <div className="all-weeks-section">
-                    <h3 className="section-title">All Weeks</h3>
+                    <h3 className="section-title">All Lessons</h3>
                     <div className="weeks-grid">
                         {groupLessonsIntoWeeks(currentStudy.lessons).map(
                             (week) => (
@@ -316,11 +319,13 @@ const ModernLeftNav: React.FC<ModernLeftNavProps> = ({
                                         }
                                     >
                                         <span className="week-title">
-                                            Week {week.weekNumber}
+                                            Lesson {week.weekNumber}
                                         </span>
                                         <span className="week-range">
-                                            Lessons {week.startLesson}-
-                                            {week.endLesson}
+                                            {week.lessons[0]?.title ||
+                                                week.lessons[0]
+                                                    ?.lessonTranslations[0]
+                                                    ?.scripture}
                                         </span>
                                         <span className="expand-icon">
                                             {expandedWeek === week.weekNumber
@@ -331,32 +336,58 @@ const ModernLeftNav: React.FC<ModernLeftNavProps> = ({
 
                                     {expandedWeek === week.weekNumber && (
                                         <div className="week-lessons-detail">
-                                            {week.lessons.map((lesson) => (
-                                                <div
-                                                    key={lesson.lessonId}
-                                                    className={`lesson-item ${
-                                                        lesson.lessonId ===
-                                                        currentLessonId
-                                                            ? "active"
-                                                            : ""
-                                                    }`}
-                                                    onClick={() =>
-                                                        handleLessonSelect(
-                                                            lesson.lessonId
-                                                        )
-                                                    }
-                                                >
-                                                    <span className="lesson-number">
-                                                        L{lesson.lessonNumber}
-                                                    </span>
-                                                    <span className="lesson-title">
-                                                        {lesson.title ||
-                                                            lesson
-                                                                .lessonTranslations[0]
-                                                                ?.scripture}
-                                                    </span>
-                                                </div>
-                                            ))}
+                                            {(() => {
+                                                const lesson = week.lessons[0];
+                                                return (
+                                                    !settings.settings
+                                                        .fullLessonMode && (
+                                                        <div
+                                                            className="lesson-days"
+                                                            style={{
+                                                                marginTop: 8,
+                                                            }}
+                                                        >
+                                                            {[
+                                                                ...lesson.lessonDays,
+                                                            ]
+                                                                .sort(
+                                                                    (a, b) =>
+                                                                        a.dayOfWeek -
+                                                                        b.dayOfWeek
+                                                                )
+                                                                .map((day) => (
+                                                                    <button
+                                                                        key={
+                                                                            day.lessonDayId
+                                                                        }
+                                                                        className={`day-btn ${
+                                                                            day.lessonDayId ===
+                                                                            currentLessonDayId
+                                                                                ? "active"
+                                                                                : ""
+                                                                        }`}
+                                                                        onClick={(
+                                                                            e
+                                                                        ) => {
+                                                                            e.stopPropagation();
+                                                                            setCurrentLessonId(
+                                                                                lesson.lessonId
+                                                                            );
+                                                                            handleDaySelect(
+                                                                                day.lessonDayId
+                                                                            );
+                                                                        }}
+                                                                    >
+                                                                        Day{" "}
+                                                                        {
+                                                                            day.dayOfWeek
+                                                                        }
+                                                                    </button>
+                                                                ))}
+                                                        </div>
+                                                    )
+                                                );
+                                            })()}
                                         </div>
                                     )}
                                 </div>

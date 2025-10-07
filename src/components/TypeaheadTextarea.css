@@ -1,10 +1,14 @@
 .textarea-wrapper {
     display: grid;
+    width: 100%;
+    min-width: 0;
 }
 
 .typeahead-input,
 .typeahead-ghost {
     width: 100%;
+    max-width: 100%;
+    min-width: 0;
     height: 100%;
     /* Ensure it covers the full height */
     border: 1px solid #ccc;
@@ -12,7 +16,10 @@
     outline: none;
     overflow: hidden;
     box-sizing: border-box;
-    resize: both;
+    resize: vertical;
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-wrap: anywhere;
     /* Ensures padding and border are included in width/height */
     grid-area: 1 / 1;
     /* This ensures both textareas are placed in the same grid cell */
@@ -29,4 +36,5 @@
     color: #aaa;
     z-index: -1;
     /* This will place it behind the main textarea */
+    pointer-events: none;
 }

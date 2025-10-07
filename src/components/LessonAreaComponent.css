@@ -132,6 +132,8 @@
 /* Modern Textarea Styling */
 .lesson-area textarea {
     width: 100%;
+    max-width: 100%;
+    min-width: 0;
     min-height: 120px;
     padding: 16px;
     border: 2px solid rgba(241, 204, 192, 0.3);
