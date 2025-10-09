@@ -29,10 +29,19 @@ const ResizeHandle: React.FC<ResizeHandleProps> = ({ onResize }) => {
         (e: MouseEvent) => {
             if (!isDragging.current) return;
 
-            const deltaX = startX.current - e.clientX; // Inverted because we're resizing from the left
-            const newWidth = startWidth.current + deltaX;
+            // Calculate the distance moved from the start position
+            const deltaX = e.clientX - startX.current;
+            const newWidth = startWidth.current - deltaX; // Subtract because we're resizing from the left edge
 
-            onResize(newWidth);
+            // Constrain the width to reasonable bounds
+            const minWidth = 200;
+            const maxWidth = Math.min(800, window.innerWidth * 0.6); // Max 60% of viewport width
+            const constrainedWidth = Math.max(
+                minWidth,
+                Math.min(maxWidth, newWidth)
+            );
+
+            onResize(constrainedWidth);
         },
         [onResize]
     );
