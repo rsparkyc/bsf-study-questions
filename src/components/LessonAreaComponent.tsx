@@ -8,12 +8,17 @@ import {
     LessonDay,
     LessonDayQuestion,
 } from "../api/bsf/response/AllLessonsResponse";
+import {
+    PinnedScripturesProvider,
+    usePinnedScriptures,
+} from "../context/PinnedScripturesContext";
 import React, { useContext } from "react";
 
 import AllScripturesResponse from "../api/bsf/response/AllScripturesResponse";
 import AnswersResponse from "../api/bsf/response/AnswersResponse";
 import { AuthContextHolder } from "../api/bsf/AuthContext";
 import LectureAndNotesComponent from "./LectureAndNotesComponent";
+import PinnedScripturesPanel from "./PinnedScripturesPanel";
 import { SaveQuestionRequest } from "../api/bsf/requests/SaveQuestionRequest";
 import Scripture from "./ScriptureComponent";
 import SettingsContext from "../context/SettingsContext";
@@ -29,7 +34,7 @@ interface LessonDayProps {
     onAnswerChange: (newAnswerData: AnswersResponse) => void;
 }
 
-const LessonAreaComponent: React.FC<LessonDayProps> = ({
+const LessonAreaContent: React.FC<LessonDayProps> = ({
     lessonDay,
     previousLessonId,
     answersData,
@@ -37,6 +42,7 @@ const LessonAreaComponent: React.FC<LessonDayProps> = ({
     onAnswerChange,
 }) => {
     const settings = useContext(SettingsContext);
+    const { pinnedScriptures, panelWidth } = usePinnedScriptures();
 
     const completionPhrase = "The sentence I want completed starts with this:";
 
@@ -291,123 +297,151 @@ const LessonAreaComponent: React.FC<LessonDayProps> = ({
         return content.replace(completionPhrase, "").trimStart();
     };
 
+    const marginRight = pinnedScriptures.length > 0 ? panelWidth : 0;
+
     return (
-        <div className="lesson-area">
-            {/* Display Lesson Day Title */}
-            <h2>{lessonDay.lessonDayTranslations[0].mainTitle}</h2>
-            <p>{lessonDay.lessonDayTranslations[0].subTitle}</p>
-            {/* Display Scriptures of the Day, but only if it has any */}
-            {lessonDay.lessonDayScriptures.length > 0 && (
-                <div className="scriptures">
-                    <h3>Scriptures for the Day:</h3>
-                    <ul>
-                        {lessonDay.lessonDayScriptures.map(
-                            (scriptureReference) => {
-                                const matchingScripture =
-                                    scripturesData?.data.find(
-                                        (s) =>
-                                            s.scriptureId ===
-                                            scriptureReference.scriptureId
-                                    );
-                                return (
-                                    <li key={scriptureReference.scriptureId}>
-                                        {matchingScripture && (
-                                            <Scripture
-                                                scriptureData={
-                                                    matchingScripture
-                                                }
-                                                verseReferences={
-                                                    scriptureReference.scripture
-                                                        .chapterVerses
-                                                }
-                                            />
-                                        )}
-                                    </li>
-                                );
-                            }
-                        )}
-                    </ul>
-                </div>
-            )}
-            {/* Display Lecture and Notes, if any, but only on the first day, and show it for previousLessonDay (if defined)*/}
-            {lessonDay.dayOfWeek === 1 && previousLessonId !== undefined && (
-                <LectureAndNotesComponent lessonId={previousLessonId} />
-            )}
-            {/* Display Questions */}
-            <div className="questions">
-                {lessonDay.lessonDayQuestions.map((question) => (
-                    <div
-                        key={question.lessonDayQuestionId}
-                        className="question"
-                    >
-                        <h4>
-                            {question.questionNumber}
-                            {question.questionSubNumber &&
-                                `.${question.questionSubNumber}`}
-                            :&nbsp;
-                            {
-                                question.lessonDayQuestionTranslations[0]
-                                    .questionText
-                            }
-                        </h4>
-                        {/* List scriptures for the question, if any */}
-                        {question.lessonDayQuestionScriptures.length > 0 && (
-                            <ul>
-                                {question.lessonDayQuestionScriptures.map(
-                                    (qScripture) => {
-                                        const matchingScripture =
-                                            scripturesData?.data.find(
-                                                (s) =>
-                                                    s.scriptureId ===
-                                                    qScripture.scriptureId
-                                            );
-                                        return (
-                                            <li key={qScripture.scriptureId}>
-                                                {matchingScripture && (
-                                                    <Scripture
-                                                        scriptureData={
-                                                            matchingScripture
-                                                        }
-                                                        verseReferences={
-                                                            qScripture.scripture
-                                                                .chapterVerses
-                                                        }
-                                                    />
-                                                )}
-                                            </li>
+        <div
+            className="lesson-area-container"
+            style={{ marginRight: `${marginRight}px` }}
+        >
+            <div className="lesson-area">
+                {/* Display Lesson Day Title */}
+                <h2>{lessonDay.lessonDayTranslations[0].mainTitle}</h2>
+                <p>{lessonDay.lessonDayTranslations[0].subTitle}</p>
+                {/* Display Scriptures of the Day, but only if it has any */}
+                {lessonDay.lessonDayScriptures.length > 0 && (
+                    <div className="scriptures">
+                        <h3>Scriptures for the Day:</h3>
+                        <ul>
+                            {lessonDay.lessonDayScriptures.map(
+                                (scriptureReference) => {
+                                    const matchingScripture =
+                                        scripturesData?.data.find(
+                                            (s) =>
+                                                s.scriptureId ===
+                                                scriptureReference.scriptureId
                                         );
-                                    }
-                                )}
-                            </ul>
-                        )}
-                        {/* Provide Input area to answer the question */}
-                        {questionShouldBeVisible(question) ? (
-                            <TypeaheadTextarea
-                                generateSuggestions={generateSuggestions}
-                                suggestionsContext={question}
-                                suggestionsDebounceTime={1500}
-                                rows={4}
-                                additionalClassNames={
-                                    isPassageDiscovery(question)
-                                        ? "passage-discovery-question"
-                                        : "standard-question"
+                                    return (
+                                        <li
+                                            key={scriptureReference.scriptureId}
+                                        >
+                                            {matchingScripture && (
+                                                <Scripture
+                                                    scriptureData={
+                                                        matchingScripture
+                                                    }
+                                                    verseReferences={
+                                                        scriptureReference
+                                                            .scripture
+                                                            .chapterVerses
+                                                    }
+                                                    hideWhenPinned={true}
+                                                />
+                                            )}
+                                        </li>
+                                    );
                                 }
-                                placeholder="Write your answer here..."
-                                defaultValue={getAnswerForQuestion(
-                                    question.lessonDayQuestionId
-                                )}
-                                onChange={(text) =>
-                                    handleAnswerChange(
-                                        question.lessonDayQuestionId,
-                                        text
-                                    )
-                                }
-                            />
-                        ) : null}
+                            )}
+                        </ul>
                     </div>
-                ))}
+                )}
+                {/* Display Lecture and Notes, if any, but only on the first day, and show it for previousLessonDay (if defined)*/}
+                {lessonDay.dayOfWeek === 1 &&
+                    previousLessonId !== undefined && (
+                        <LectureAndNotesComponent lessonId={previousLessonId} />
+                    )}
+                {/* Display Questions */}
+                <div className="questions">
+                    {lessonDay.lessonDayQuestions.map((question) => (
+                        <div
+                            key={question.lessonDayQuestionId}
+                            className="question"
+                        >
+                            <h4>
+                                {question.questionNumber}
+                                {question.questionSubNumber &&
+                                    `.${question.questionSubNumber}`}
+                                :&nbsp;
+                                {
+                                    question.lessonDayQuestionTranslations[0]
+                                        .questionText
+                                }
+                            </h4>
+                            {/* List scriptures for the question, if any */}
+                            {question.lessonDayQuestionScriptures.length >
+                                0 && (
+                                <ul>
+                                    {question.lessonDayQuestionScriptures.map(
+                                        (qScripture) => {
+                                            const matchingScripture =
+                                                scripturesData?.data.find(
+                                                    (s) =>
+                                                        s.scriptureId ===
+                                                        qScripture.scriptureId
+                                                );
+                                            return (
+                                                <li
+                                                    key={qScripture.scriptureId}
+                                                >
+                                                    {matchingScripture && (
+                                                        <Scripture
+                                                            scriptureData={
+                                                                matchingScripture
+                                                            }
+                                                            verseReferences={
+                                                                qScripture
+                                                                    .scripture
+                                                                    .chapterVerses
+                                                            }
+                                                            hideWhenPinned={
+                                                                true
+                                                            }
+                                                        />
+                                                    )}
+                                                </li>
+                                            );
+                                        }
+                                    )}
+                                </ul>
+                            )}
+                            {/* Provide Input area to answer the question */}
+                            {questionShouldBeVisible(question) ? (
+                                <TypeaheadTextarea
+                                    generateSuggestions={generateSuggestions}
+                                    suggestionsContext={question}
+                                    suggestionsDebounceTime={1500}
+                                    rows={4}
+                                    additionalClassNames={
+                                        isPassageDiscovery(question)
+                                            ? "passage-discovery-question"
+                                            : "standard-question"
+                                    }
+                                    placeholder="Write your answer here..."
+                                    defaultValue={getAnswerForQuestion(
+                                        question.lessonDayQuestionId
+                                    )}
+                                    onChange={(text) =>
+                                        handleAnswerChange(
+                                            question.lessonDayQuestionId,
+                                            text
+                                        )
+                                    }
+                                />
+                            ) : null}
+                        </div>
+                    ))}
+                </div>
             </div>
+            <PinnedScripturesPanel />
         </div>
+    );
+};
+
+const LessonAreaComponent: React.FC<LessonDayProps> = (props) => {
+    return (
+        <PinnedScripturesProvider>
+            <LessonAreaContent {...props} />
+        </PinnedScripturesProvider>
     );
 };
 

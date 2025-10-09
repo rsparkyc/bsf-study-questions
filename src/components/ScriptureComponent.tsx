@@ -3,22 +3,48 @@ import "./ScriptureComponent.css";
 import { PopoverComponent } from "./PopoverComponent";
 import React from "react";
 import { ScriptureData } from "../api/bsf/response/AllScripturesResponse";
+import { usePinnedScriptures } from "../context/PinnedScripturesContext";
 import { useState } from "react";
 
 interface ScriptureProps {
     scriptureData: ScriptureData;
     verseReferences: string;
+    hideWhenPinned?: boolean;
 }
 
 const Scripture: React.FC<ScriptureProps> = ({
     scriptureData,
     verseReferences,
+    hideWhenPinned = false,
 }) => {
     const [isExpanded, setIsExpanded] = useState(false);
+    const { pinScripture, unpinScripture, isPinned, getPinnedScriptureId } =
+        usePinnedScriptures();
 
     const toggleScriptureText = () => {
         setIsExpanded(!isExpanded);
     };
+
+    const handlePinToggle = () => {
+        if (isPinned(scriptureData, verseReferences)) {
+            const pinnedId = getPinnedScriptureId(
+                scriptureData,
+                verseReferences
+            );
+            if (pinnedId) {
+                unpinScripture(pinnedId);
+            }
+        } else {
+            pinScripture(scriptureData, verseReferences);
+        }
+    };
+
+    const isCurrentlyPinned = isPinned(scriptureData, verseReferences);
+
+    // Hide the scripture if it's pinned and hideWhenPinned is true
+    if (hideWhenPinned && isCurrentlyPinned) {
+        return null;
+    }
 
     function unescapeString(s: string): string {
         if (s.startsWith('"')) {
@@ -90,9 +116,27 @@ const Scripture: React.FC<ScriptureProps> = ({
 
     return (
         <div className="scripture">
-            <button onClick={toggleScriptureText}>
-                {scriptureData.name} {verseReferences}
-            </button>
+            <div className="scripture-header">
+                <button
+                    onClick={toggleScriptureText}
+                    className="scripture-toggle-button"
+                >
+                    {scriptureData.name} {verseReferences}
+                </button>
+                <button
+                    onClick={handlePinToggle}
+                    className={`pin-button ${
+                        isCurrentlyPinned ? "pinned" : "unpinned"
+                    }`}
+                    title={
+                        isCurrentlyPinned
+                            ? "Unpin from right panel"
+                            : "Pin to right panel"
+                    }
+                >
+                    {isCurrentlyPinned ? "📌" : "➕"}
+                </button>
+            </div>
             {isExpanded && (
                 <div className="expanded-scripture">{transformedContent}</div>
             )}

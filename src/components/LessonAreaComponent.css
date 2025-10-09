@@ -1,14 +1,18 @@
 /* Modern Lesson Area Styling */
-.lesson-area {
-    background: linear-gradient(135deg, #faf7f5 0%, #f5f0eb 100%);
+.lesson-area-container {
     min-height: 100vh;
+    background: linear-gradient(135deg, #faf7f5 0%, #f5f0eb 100%);
+    transition: margin-right 0.3s ease;
+}
+
+.lesson-area {
     padding: 24px 32px;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
         sans-serif;
     color: #5d4e37;
     line-height: 1.6;
     max-width: none;
-    width: 100%;
+    min-width: 0;
 }
 
 /* Lesson Day Header */
@@ -204,6 +208,10 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
+    .lesson-area-container {
+        margin-right: 0 !important;
+    }
+
     .lesson-area {
         padding: 20px;
     }
@@ -224,6 +232,15 @@
     .lesson-area textarea {
         padding: 12px;
         font-size: 16px;
+    }
+
+    .pinned-scriptures-panel {
+        height: auto;
+        max-height: 50vh;
+        border-left: none;
+        border-top: 1px solid rgba(241, 204, 192, 0.3);
+        min-width: auto;
+        max-width: none;
     }
 }
 
