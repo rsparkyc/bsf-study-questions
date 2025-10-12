@@ -46,6 +46,68 @@ const LessonAreaContent: React.FC<LessonDayProps> = ({
 
     const completionPhrase = "The sentence I want completed starts with this:";
 
+    // Debounce only the server save, not the local state update
+    const debouncedSaveToServer = React.useMemo(
+        () =>
+            debounce((questionId: number, answerText: string) => {
+                const saveRequest = new SaveQuestionRequest(
+                    AuthContextHolder.getAuthContext(),
+                    questionId,
+                    answerText
+                );
+                saveRequest.makeRequest();
+            }, 2000),
+        []
+    );
+
+    const handleAnswerChange = (questionId: number, answerText: string) => {
+        console.log(
+            `🔵 handleAnswerChange called - questionId: ${questionId}, answerText length: ${answerText.length}`
+        );
+
+        // Update local state immediately
+        if (answersData) {
+            // Check if answer exists
+            const existingAnswerIndex = answersData.data.findIndex(
+                (answer) => answer.lessonDayQuestionId === questionId
+            );
+
+            console.log(`🔵 Existing answer index: ${existingAnswerIndex}`);
+
+            let newData;
+            if (existingAnswerIndex !== -1) {
+                // Update existing answer
+                newData = answersData.data.map((answer) => {
+                    if (answer.lessonDayQuestionId === questionId) {
+                        return { ...answer, answerText };
+                    }
+                    return answer;
+                });
+                console.log(`🔵 Updated existing answer`);
+            } else {
+                // Create new answer entry
+                const newAnswer = {
+                    lessonDayQuestionId: questionId,
+                    answerText,
+                    creationTime: new Date().toISOString(),
+                    lastModifiedTime: new Date().toISOString(),
+                    personId: 0, // This will be set by the server
+                };
+                newData = [...answersData.data, newAnswer];
+                console.log(`🔵 Created new answer`);
+            }
+
+            const newAnswerData = { ...answersData, data: newData };
+            console.log(
+                `🔵 Calling onAnswerChange with ${newData.length} answers`
+            );
+            onAnswerChange(newAnswerData);
+        }
+
+        // Debounce the server save
+        debouncedSaveToServer(questionId, answerText);
+    };
+
     if (!lessonDay) {
         return <div>Loading Lesson Day Information...</div>;
     }
@@ -54,31 +116,13 @@ const LessonAreaContent: React.FC<LessonDayProps> = ({
         const foundAnswer = answersData?.data.find(
             (answer) => answer.lessonDayQuestionId === questionId
         );
+        console.log(
+            `🟢 getAnswerForQuestion(${questionId}) - found: ${
+                foundAnswer ? "yes" : "no"
+            }, text length: ${foundAnswer?.answerText?.length || 0}`
+        );
         return foundAnswer?.answerText;
     };
-
-    const handleAnswerChange = debounce(
-        (questionId: number, answerText: string) => {
-            if (answersData) {
-                const ans = answersData.data.find(
-                    (answer) => answer.lessonDayQuestionId === questionId
-                );
-                if (ans) {
-                    ans.answerText = answerText;
-                }
-                const newAnswerData = { ...answersData };
-                onAnswerChange(newAnswerData);
-            }
-
-            const saveRequest = new SaveQuestionRequest(
-                AuthContextHolder.getAuthContext(),
-                questionId,
-                answerText
-            );
-            saveRequest.makeRequest();
-        },
-        2000
-    );
 
     const questionShouldBeVisible = (
         question: LessonDayQuestion
@@ -407,6 +451,7 @@ const LessonAreaContent: React.FC<LessonDayProps> = ({
                             {/* Provide Input area to answer the question */}
                             {questionShouldBeVisible(question) ? (
                                 <TypeaheadTextarea
+                                    key={question.lessonDayQuestionId}
                                     generateSuggestions={generateSuggestions}
                                     suggestionsContext={question}
                                     suggestionsDebounceTime={1500}

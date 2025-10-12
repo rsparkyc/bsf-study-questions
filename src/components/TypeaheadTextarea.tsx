@@ -1,6 +1,6 @@
 import "./TypeaheadTextarea.css";
 
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 import StringUtils from "../utils/StringUtils";
 import debounce from "lodash.debounce";
@@ -38,6 +38,14 @@ export const TypeaheadTextarea: React.FC<Props> = ({
 
     const mainTextareaRef = React.useRef<HTMLTextAreaElement>(null);
     const ghostTextareaRef = React.useRef<HTMLTextAreaElement>(null);
+
+    // Sync inputValue with defaultValue when it changes (e.g., when switching between days)
+    useEffect(() => {
+        console.log(
+            `🟣 TypeaheadTextarea: defaultValue changed, setting inputValue to: "${defaultValue}"`
+        );
+        setInputValue(defaultValue || "");
+    }, [defaultValue]);
 
     const handleScroll = (event: React.UIEvent<HTMLTextAreaElement>) => {
         if (ghostTextareaRef.current) {

@@ -44,6 +44,9 @@ const LessonContainer: React.FC = () => {
     const settings = useContext(SettingsContext);
 
     const handleAnswerChange = (newAnswerData: AnswersResponse) => {
+        console.log(
+            `🟡 Parent handleAnswerChange called with ${newAnswerData.data.length} answers`
+        );
         setAnswersData(newAnswerData);
     };
 
