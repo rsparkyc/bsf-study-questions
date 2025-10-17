@@ -277,3 +277,72 @@
 #lesson-title {
     animation: fadeInUp 0.5s ease-out 0.2s both;
 }
+
+/* Answer Input Container */
+.answer-input-container {
+    position: relative;
+}
+
+/* Save Indicator */
+.save-indicator {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    margin-top: 8px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    align-self: flex-end;
+    margin-left: auto;
+    width: fit-content;
+    transition: all 0.3s ease;
+}
+
+.save-indicator-icon {
+    font-size: 14px;
+    display: inline-block;
+}
+
+.save-indicator-text {
+    font-weight: 500;
+}
+
+/* Unsaved State */
+.save-indicator-unsaved {
+    color: #e8b4a0;
+    background: rgba(232, 180, 160, 0.1);
+}
+
+.save-indicator-unsaved .save-indicator-icon {
+    color: #e8b4a0;
+}
+
+/* Saving State */
+.save-indicator-saving {
+    color: #8b6f47;
+    background: rgba(139, 111, 71, 0.1);
+}
+
+.save-indicator-saving .save-indicator-icon {
+    animation: rotate 1s linear infinite;
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Saved State */
+.save-indicator-saved {
+    color: #4a9d5f;
+    background: rgba(74, 157, 95, 0.1);
+}
+
+.save-indicator-saved .save-indicator-icon {
+    color: #4a9d5f;
+    font-weight: bold;
+}

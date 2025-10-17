@@ -12,7 +12,7 @@ import {
     PinnedScripturesProvider,
     usePinnedScriptures,
 } from "../context/PinnedScripturesContext";
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 
 import AllScripturesResponse from "../api/bsf/response/AllScripturesResponse";
 import AnswersResponse from "../api/bsf/response/AnswersResponse";
@@ -34,6 +34,39 @@ interface LessonDayProps {
     onAnswerChange: (newAnswerData: AnswersResponse) => void;
 }
 
+type SaveStatus = "idle" | "unsaved" | "saving" | "saved";
+
+interface SaveIndicatorProps {
+    status: SaveStatus;
+}
+
+const SaveIndicator: React.FC<SaveIndicatorProps> = ({ status }) => {
+    if (status === "idle") return null;
+
+    return (
+        <div className={`save-indicator save-indicator-${status}`}>
+            {status === "unsaved" && (
+                <>
+                    <span className="save-indicator-icon">●</span>
+                    <span className="save-indicator-text">Unsaved changes</span>
+                </>
+            )}
+            {status === "saving" && (
+                <>
+                    <span className="save-indicator-icon saving">◐</span>
+                    <span className="save-indicator-text">Saving...</span>
+                </>
+            )}
+            {status === "saved" && (
+                <>
+                    <span className="save-indicator-icon">✓</span>
+                    <span className="save-indicator-text">Saved</span>
+                </>
+            )}
+        </div>
+    );
+};
+
 const LessonAreaContent: React.FC<LessonDayProps> = ({
     lessonDay,
     previousLessonId,
@@ -46,16 +79,57 @@ const LessonAreaContent: React.FC<LessonDayProps> = ({
 
     const completionPhrase = "The sentence I want completed starts with this:";
 
+    // Track save status for each question
+    const [saveStatuses, setSaveStatuses] = useState<
+        Record<number, SaveStatus>
+    >({});
+    const savedTimeouts = useRef<Record<number, NodeJS.Timeout>>({});
+
+    // Update save status for a question
+    const updateSaveStatus = (questionId: number, status: SaveStatus) => {
+        setSaveStatuses((prev) => ({ ...prev, [questionId]: status }));
+
+        // If status is "saved", set a timeout to hide the indicator after 3 seconds
+        if (status === "saved") {
+            // Clear any existing timeout for this question
+            if (savedTimeouts.current[questionId]) {
+                clearTimeout(savedTimeouts.current[questionId]);
+            }
+
+            // Set new timeout to change status to idle
+            savedTimeouts.current[questionId] = setTimeout(() => {
+                setSaveStatuses((prev) => ({ ...prev, [questionId]: "idle" }));
+                delete savedTimeouts.current[questionId];
+            }, 3000);
+        }
+    };
+
+    // Cleanup timeouts on unmount
+    useEffect(() => {
+        const timeouts = savedTimeouts.current;
+        return () => {
+            Object.values(timeouts).forEach(clearTimeout);
+        };
+    }, []);
+
     // Debounce only the server save, not the local state update
     const debouncedSaveToServer = React.useMemo(
         () =>
-            debounce((questionId: number, answerText: string) => {
-                const saveRequest = new SaveQuestionRequest(
-                    AuthContextHolder.getAuthContext(),
-                    questionId,
-                    answerText
-                );
-                saveRequest.makeRequest();
+            debounce(async (questionId: number, answerText: string) => {
+                updateSaveStatus(questionId, "saving");
+                try {
+                    const saveRequest = new SaveQuestionRequest(
+                        AuthContextHolder.getAuthContext(),
+                        questionId,
+                        answerText
+                    );
+                    await saveRequest.makeRequest();
+                    updateSaveStatus(questionId, "saved");
+                } catch (error) {
+                    console.error("Error saving answer:", error);
+                    // On error, revert to unsaved
+                    updateSaveStatus(questionId, "unsaved");
+                }
             }, 2000),
         []
     );
@@ -64,6 +138,9 @@ const LessonAreaContent: React.FC<LessonDayProps> = ({
         console.log(
             `🔵 handleAnswerChange called - questionId: ${questionId}, answerText length: ${answerText.length}`
         );
+
+        // Set status to unsaved immediately
+        updateSaveStatus(questionId, "unsaved");
 
         // Update local state immediately
         if (answersData) {
@@ -450,28 +527,39 @@ const LessonAreaContent: React.FC<LessonDayProps> = ({
                             )}
                             {/* Provide Input area to answer the question */}
                             {questionShouldBeVisible(question) ? (
-                                <TypeaheadTextarea
-                                    key={question.lessonDayQuestionId}
-                                    generateSuggestions={generateSuggestions}
-                                    suggestionsContext={question}
-                                    suggestionsDebounceTime={1500}
-                                    rows={4}
-                                    additionalClassNames={
-                                        isPassageDiscovery(question)
-                                            ? "passage-discovery-question"
-                                            : "standard-question"
-                                    }
-                                    placeholder="Write your answer here..."
-                                    defaultValue={getAnswerForQuestion(
-                                        question.lessonDayQuestionId
-                                    )}
-                                    onChange={(text) =>
-                                        handleAnswerChange(
-                                            question.lessonDayQuestionId,
-                                            text
-                                        )
-                                    }
-                                />
+                                <div className="answer-input-container">
+                                    <TypeaheadTextarea
+                                        key={question.lessonDayQuestionId}
+                                        generateSuggestions={
+                                            generateSuggestions
+                                        }
+                                        suggestionsContext={question}
+                                        suggestionsDebounceTime={1500}
+                                        rows={4}
+                                        additionalClassNames={
+                                            isPassageDiscovery(question)
+                                                ? "passage-discovery-question"
+                                                : "standard-question"
+                                        }
+                                        placeholder="Write your answer here..."
+                                        defaultValue={getAnswerForQuestion(
+                                            question.lessonDayQuestionId
+                                        )}
+                                        onChange={(text) =>
+                                            handleAnswerChange(
+                                                question.lessonDayQuestionId,
+                                                text
+                                            )
+                                        }
+                                    />
+                                    <SaveIndicator
+                                        status={
+                                            saveStatuses[
+                                                question.lessonDayQuestionId
+                                            ] || "idle"
+                                        }
+                                    />
+                                </div>
                             ) : null}
                         </div>
                     ))}
