@@ -327,95 +327,112 @@ const ModernLeftNav: React.FC<ModernLeftNavProps> = ({
                     <h3 className="section-title">All Lessons</h3>
                     <div className="weeks-grid">
                         {groupLessonsIntoWeeks(currentStudy.lessons).map(
-                            (week) => (
-                                <div
-                                    key={week.weekNumber}
-                                    className="week-card"
-                                >
-                                    <button
-                                        className="week-header"
-                                        onClick={() =>
-                                            toggleWeek(week.weekNumber)
-                                        }
+                            (week) => {
+                                const isCurrentWeek = week.lessons.some(
+                                    (lesson) =>
+                                        lesson.lessonId === currentLessonId
+                                );
+                                return (
+                                    <div
+                                        key={week.weekNumber}
+                                        className={`week-card ${
+                                            isCurrentWeek ? "active" : ""
+                                        }`}
                                     >
-                                        <span className="week-title">
-                                            Lesson {week.weekNumber}
-                                        </span>
-                                        <span className="week-range">
-                                            {week.lessons[0]?.title ||
-                                                week.lessons[0]
-                                                    ?.lessonTranslations[0]
-                                                    ?.scripture}
-                                        </span>
-                                        <span className="expand-icon">
-                                            {expandedWeek === week.weekNumber
-                                                ? "−"
-                                                : "+"}
-                                        </span>
-                                    </button>
+                                        <button
+                                            className="week-header"
+                                            onClick={() =>
+                                                toggleWeek(week.weekNumber)
+                                            }
+                                        >
+                                            <span className="week-title">
+                                                Lesson {week.weekNumber}
+                                            </span>
+                                            <span className="week-range">
+                                                {week.lessons[0]?.title ||
+                                                    week.lessons[0]
+                                                        ?.lessonTranslations[0]
+                                                        ?.scripture}
+                                            </span>
+                                            <span className="expand-icon">
+                                                {expandedWeek ===
+                                                week.weekNumber
+                                                    ? "−"
+                                                    : "+"}
+                                            </span>
+                                        </button>
 
-                                    {expandedWeek === week.weekNumber && (
-                                        <div className="week-lessons-detail">
-                                            {(() => {
-                                                const lesson = week.lessons[0];
-                                                return (
-                                                    !settings.settings
-                                                        .fullLessonMode && (
-                                                        <div
-                                                            className="lesson-days"
-                                                            style={{
-                                                                marginTop: 8,
-                                                            }}
-                                                        >
-                                                            {[
-                                                                ...lesson.lessonDays,
-                                                            ]
-                                                                .sort(
-                                                                    (a, b) =>
-                                                                        a.dayOfWeek -
-                                                                        b.dayOfWeek
-                                                                )
-                                                                .map((day) => (
-                                                                    <button
-                                                                        key={
-                                                                            day.lessonDayId
-                                                                        }
-                                                                        className={`day-btn ${
-                                                                            day.lessonDayId ===
-                                                                            currentLessonDayId
-                                                                                ? "active"
-                                                                                : ""
-                                                                        }`}
-                                                                        onClick={(
-                                                                            e
-                                                                        ) => {
-                                                                            e.stopPropagation();
-                                                                            setCurrentLessonId(
-                                                                                lesson.lessonId
-                                                                            );
-                                                                            localStorage.setItem(
-                                                                                "currentLessonId",
-                                                                                lesson.lessonId.toString()
-                                                                            );
-                                                                            handleDaySelect(
-                                                                                day.lessonDayId
-                                                                            );
-                                                                        }}
-                                                                    >
-                                                                        Day{" "}
-                                                                        {
-                                                                            day.dayOfWeek
-                                                                        }
-                                                                    </button>
-                                                                ))}
-                                                        </div>
-                                                    )
-                                                );
-                                            })()}
-                                        </div>
-                                    )}
-                                </div>
-                            )
+                                        {expandedWeek === week.weekNumber && (
+                                            <div className="week-lessons-detail">
+                                                {(() => {
+                                                    const lesson =
+                                                        week.lessons[0];
+                                                    return (
+                                                        !settings.settings
+                                                            .fullLessonMode && (
+                                                            <div
+                                                                className="lesson-days"
+                                                                style={{
+                                                                    marginTop: 8,
+                                                                }}
+                                                            >
+                                                                {[
+                                                                    ...lesson.lessonDays,
+                                                                ]
+                                                                    .sort(
+                                                                        (
+                                                                            a,
+                                                                            b
+                                                                        ) =>
+                                                                            a.dayOfWeek -
+                                                                            b.dayOfWeek
+                                                                    )
+                                                                    .map(
+                                                                        (
+                                                                            day
+                                                                        ) => (
+                                                                            <button
+                                                                                key={
+                                                                                    day.lessonDayId
+                                                                                }
+                                                                                className={`day-btn ${
+                                                                                    day.lessonDayId ===
+                                                                                    currentLessonDayId
+                                                                                        ? "active"
+                                                                                        : ""
+                                                                                }`}
+                                                                                onClick={(
+                                                                                    e
+                                                                                ) => {
+                                                                                    e.stopPropagation();
+                                                                                    setCurrentLessonId(
+                                                                                        lesson.lessonId
+                                                                                    );
+                                                                                    localStorage.setItem(
+                                                                                        "currentLessonId",
+                                                                                        lesson.lessonId.toString()
+                                                                                    );
+                                                                                    handleDaySelect(
+                                                                                        day.lessonDayId
+                                                                                    );
+                                                                                }}
+                                                                            >
+                                                                                Day{" "}
+                                                                                {
+                                                                                    day.dayOfWeek
+                                                                                }
+                                                                            </button>
+                                                                        )
+                                                                    )}
+                                                            </div>
+                                                        )
+                                                    );
+                                                })()}
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            }
                         )}
                     </div>
                 </div>

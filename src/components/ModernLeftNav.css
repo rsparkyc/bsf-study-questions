@@ -168,6 +168,7 @@
     cursor: pointer;
     transition: all 0.2s ease;
     backdrop-filter: blur(5px);
+    position: relative;
 }
 
 .lesson-card:hover {
@@ -177,9 +178,26 @@
 }
 
 .lesson-card.active {
-    background: rgba(255, 255, 255, 0.5);
-    border-color: rgba(255, 255, 255, 0.6);
-    box-shadow: 0 4px 16px rgba(139, 111, 71, 0.3);
+    background: linear-gradient(
+        135deg,
+        rgba(232, 180, 160, 0.4) 0%,
+        rgba(255, 255, 255, 0.6) 100%
+    );
+    border: 2px solid #e8b4a0;
+    border-left: 4px solid #d4a088;
+    box-shadow: 0 6px 20px rgba(212, 160, 136, 0.5),
+        inset 0 1px 3px rgba(255, 255, 255, 0.5);
+    transform: translateX(2px);
+}
+
+.lesson-card.active::before {
+    content: "▶";
+    position: absolute;
+    left: -8px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #d4a088;
+    font-size: 16px;
 }
 
 .lesson-number {
@@ -189,11 +207,21 @@
     margin-bottom: 4px;
 }
 
+.lesson-card.active .lesson-number {
+    color: #d4a088;
+    font-weight: 700;
+}
+
 .lesson-title {
     font-size: 14px;
     font-weight: 500;
     color: #5d4e37;
     line-height: 1.4;
+}
+
+.lesson-card.active .lesson-title {
+    font-weight: 600;
+    color: #4a3728;
 }
 
 .lesson-days {
@@ -205,7 +233,7 @@
 
 .day-btn {
     background: rgba(255, 255, 255, 0.4);
-    border: none;
+    border: 1px solid transparent;
     color: #5d4e37;
     padding: 4px 8px;
     border-radius: 4px;
@@ -220,8 +248,11 @@
 }
 
 .day-btn.active {
-    background: rgba(255, 255, 255, 0.7);
-    font-weight: 600;
+    background: linear-gradient(135deg, #e8b4a0 0%, #d4a088 100%);
+    color: #ffffff;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(212, 160, 136, 0.4);
+    border: 1px solid #d4a088;
 }
 
 /* All Weeks Section */
@@ -242,6 +273,22 @@
     border-radius: 8px;
     overflow: hidden;
     transition: all 0.2s ease;
+    position: relative;
+}
+
+.week-card.active {
+    background: rgba(232, 180, 160, 0.3);
+    border: 2px solid #e8b4a0;
+}
+
+.week-card.active::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, #e8b4a0 0%, #d4a088 100%);
 }
 
 .week-card:hover {
