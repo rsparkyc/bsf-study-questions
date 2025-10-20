@@ -2,14 +2,14 @@
 .pinned-scriptures-panel {
     background: rgba(255, 255, 255, 0.95);
     border-left: 1px solid rgba(241, 204, 192, 0.3);
-    height: 100vh;
+    height: calc(100vh - 70px);
     overflow-y: auto;
     padding: 20px;
     box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
     backdrop-filter: blur(10px);
     position: fixed;
     right: 0;
-    top: 0;
+    top: 70px;
     flex-shrink: 0;
     z-index: 100;
 }
@@ -112,6 +112,7 @@
         padding: 16px;
         border-left: none;
         border-top: 1px solid rgba(241, 204, 192, 0.3);
+        top: 0;
     }
 
     .pinned-scripture-item {

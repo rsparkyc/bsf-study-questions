@@ -224,7 +224,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginStateChange }) => {
     }, [accessToken, calculateTokenTimeLeft]);
 
     return (
-        <div className="login-container">
+        <div className={`login-container ${isLoggedIn ? "logged-in" : ""}`}>
             {isLoggedIn && (
                 <div className="login-header">
                     <div>Logged in as {user}</div>

@@ -42,6 +42,8 @@
     min-width: 0;
     flex-direction: column;
     margin-bottom: 50px;
+    margin-left: 320px;
+    padding-top: 70px;
 }
 
 #lesson-title h1 {
@@ -67,6 +69,11 @@
         width: 100%;
         padding-left: 0;
         padding-right: 0;
+    }
+
+    .lesson-area-v {
+        margin-left: 0;
+        padding-top: 90px;
     }
 }
 
