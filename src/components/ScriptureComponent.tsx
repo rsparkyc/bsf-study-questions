@@ -2,6 +2,7 @@ import "./ScriptureComponent.css";
 
 import { PopoverComponent } from "./PopoverComponent";
 import React from "react";
+import { SCRIPTURE_COPYRIGHT_TEXT } from "../constants/appConstants";
 import { ScriptureData } from "../api/bsf/response/AllScripturesResponse";
 import { usePinnedScriptures } from "../context/PinnedScripturesContext";
 import { useState } from "react";
@@ -138,7 +139,14 @@ const Scripture: React.FC<ScriptureProps> = ({
                 </button>
             </div>
             {isExpanded && (
-                <div className="expanded-scripture">{transformedContent}</div>
+                <>
+                    <div className="expanded-scripture">
+                        {transformedContent}
+                    </div>
+                    <div className="scripture-footer">
+                        {SCRIPTURE_COPYRIGHT_TEXT}
+                    </div>
+                </>
             )}
         </div>
     );
