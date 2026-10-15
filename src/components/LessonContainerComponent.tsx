@@ -41,7 +41,18 @@ const LessonContainer: React.FC = () => {
         localStorage.getItem("currentLessonDayId") || "0"
     );
 
+    const [navCollapsed, setNavCollapsed] = useState(
+        localStorage.getItem("navCollapsed") === "true"
+    );
+
     const settings = useContext(SettingsContext);
+
+    const toggleNav = () => {
+        setNavCollapsed((collapsed) => {
+            localStorage.setItem("navCollapsed", String(!collapsed));
+            return !collapsed;
+        });
+    };
 
     const handleAnswerChange = (newAnswerData: AnswersResponse) => {
         console.log(
@@ -106,9 +117,22 @@ const LessonContainer: React.FC = () => {
     }, []);
 
     return (
-        <div className="lesson-container">
+        <div
+            className={`lesson-container ${navCollapsed ? "nav-collapsed" : ""}`}
+        >
             <div className="content-row">
-                {settings.settings.modernNavigation ? (
+                <button
+                    className="nav-toggle-btn"
+                    onClick={toggleNav}
+                    aria-label={
+                        navCollapsed ? "Show navigation" : "Hide navigation"
+                    }
+                    aria-expanded={!navCollapsed}
+                    title={navCollapsed ? "Show navigation" : "Hide navigation"}
+                >
+                    {navCollapsed ? "›" : "‹"}
+                </button>
+                {navCollapsed ? null : settings.settings.modernNavigation ? (
                     <ModernLeftNav
                         data={lessonData}
                         setCurrentStudyId={setCurrentStudyId}

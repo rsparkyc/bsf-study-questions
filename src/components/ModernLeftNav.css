@@ -408,7 +408,7 @@
 }
 
 /* Responsive Design */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
     .modern-nav {
         position: relative;
         width: 100%;
