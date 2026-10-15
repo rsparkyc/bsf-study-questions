@@ -11,14 +11,16 @@ interface ScriptureProps {
     scriptureData: ScriptureData;
     verseReferences: string;
     hideWhenPinned?: boolean;
+    defaultExpanded?: boolean;
 }
 
 const Scripture: React.FC<ScriptureProps> = ({
     scriptureData,
     verseReferences,
     hideWhenPinned = false,
+    defaultExpanded = false,
 }) => {
-    const [isExpanded, setIsExpanded] = useState(false);
+    const [isExpanded, setIsExpanded] = useState(defaultExpanded);
     const { pinScripture, unpinScripture, isPinned, getPinnedScriptureId } =
         usePinnedScriptures();
 

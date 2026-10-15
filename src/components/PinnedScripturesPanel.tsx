@@ -35,6 +35,7 @@ const PinnedScripturesPanel: React.FC = () => {
                         <Scripture
                             scriptureData={pinnedScripture.scriptureData}
                             verseReferences={pinnedScripture.verseReferences}
+                            defaultExpanded={true}
                         />
                     </div>
                 ))}

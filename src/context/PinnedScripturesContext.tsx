@@ -37,7 +37,7 @@ export const PinnedScripturesProvider: React.FC<{ children: ReactNode }> = ({
     const [pinnedScriptures, setPinnedScriptures] = useState<PinnedScripture[]>(
         []
     );
-    const [panelWidth, setPanelWidth] = useState<number>(350);
+    const [panelWidth, setPanelWidth] = useState<number>(600);
 
     const generateId = (
         scriptureData: ScriptureData,
