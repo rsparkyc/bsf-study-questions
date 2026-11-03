@@ -7,6 +7,7 @@ export interface ScriptureData {
     name: string;
     longName: string;
     abbreviation: string;
+    chapterVerses?: string;
 }
 
 export default interface AllScripturesResponse {

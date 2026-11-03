@@ -271,7 +271,8 @@ const LessonAreaContent: React.FC<LessonDayProps> = ({
             return (
                 scripture?.longName +
                     " " +
-                    currentScriptureReferenceData.scripture.chapterVerses +
+                    (currentScriptureReferenceData.scripture?.chapterVerses ??
+                        scripture?.chapterVerses) +
                     " - " +
                     doc.body.textContent || ""
             );
@@ -452,9 +453,9 @@ const LessonAreaContent: React.FC<LessonDayProps> = ({
                                                         matchingScripture
                                                     }
                                                     verseReferences={
-                                                        scriptureReference
-                                                            .scripture
-                                                            .chapterVerses
+                                                        scriptureReference.scripture?.chapterVerses ??
+                                                        matchingScripture.chapterVerses ??
+                                                        ""
                                                     }
                                                     hideWhenPinned={true}
                                                 />
@@ -510,9 +511,9 @@ const LessonAreaContent: React.FC<LessonDayProps> = ({
                                                                 matchingScripture
                                                             }
                                                             verseReferences={
-                                                                qScripture
-                                                                    .scripture
-                                                                    .chapterVerses
+                                                                qScripture.scripture?.chapterVerses ??
+                                                                matchingScripture.chapterVerses ??
+                                                                ""
                                                             }
                                                             hideWhenPinned={
                                                                 true

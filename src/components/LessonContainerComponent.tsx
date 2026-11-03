@@ -1,10 +1,16 @@
 import "./LessonContainerComponent.css";
 
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 
-import { AllLessonsRequest } from "../api/bsf/requests/AllLessonsRequest";
-import AllLessonsResponse from "../api/bsf/response/AllLessonsResponse";
-import { AllScripturesRequest } from "../api/bsf/requests/AllScripturesRequest";
+import AllLessonsResponse, { Study } from "../api/bsf/response/AllLessonsResponse";
+import {
+    loadLessonIndex,
+    loadStudyContent,
+    loadStudyScriptures,
+    studyFromIndex,
+} from "../api/bsf/studyData";
+import { cacheGet, cacheSet } from "../api/bsf/cache/idbCache";
+import { LessonIndexStudy } from "../api/bsf/response/StudyV2Responses";
 import AllScripturesResponse from "../api/bsf/response/AllScripturesResponse";
 import { AnswersRequest } from "../api/bsf/requests/AnswersRequest";
 import AnswersResponse from "../api/bsf/response/AnswersResponse";
@@ -32,6 +38,8 @@ const LessonContainer: React.FC = () => {
     const [currentLessonDayId, setCurrentLessonDayId] = useState<
         number | undefined
     >();
+    const [defaultStudyId, setDefaultStudyId] = useState<number | undefined>();
+    const loadedScriptureStudies = useRef(new Set<number>());
 
     const savedStudyId = Number(localStorage.getItem("currentStudyId") || "0");
     const savedLessonId = Number(
@@ -61,60 +69,153 @@ const LessonContainer: React.FC = () => {
         setAnswersData(newAnswerData);
     };
 
-    const postProcessLessonResponse = (response: AllLessonsResponse) => {
-        for (const study of response.data.studies) {
-            for (const lesson of study.lessons) {
-                for (const lessonDay of lesson.lessonDays) {
-                    const fullTitle = lessonDay.lessonDayTranslations[0].title;
-                    // split on newline, and save the first part as the mainTitle and the rest as the subTitle
-                    const splitTitle = fullTitle.split("\n");
-                    lessonDay.lessonDayTranslations[0].mainTitle =
-                        splitTitle[0];
-                    lessonDay.lessonDayTranslations[0].subTitle = splitTitle[1];
-                }
-            }
-        }
-    };
+    const mergeStudy = (study: Study) =>
+        setLessonData((prev) =>
+            prev
+                ? {
+                      ...prev,
+                      data: {
+                          ...prev.data,
+                          studies: prev.data.studies.map((s) =>
+                              s.studyId === study.studyId ? study : s
+                          ),
+                      },
+                  }
+                : prev
+        );
 
     useEffect(() => {
-        // Fetch your API data here and set it to the state
+        let cancelled = false;
         async function fetchData() {
             const authContext = AuthContextHolder.getAuthContext();
-            if (authContext.timeRemaining() > 0) {
-                const allLessonsPromise = new AllLessonsRequest(
-                    authContext
-                ).makeRequest();
-                const answersPromise = new AnswersRequest(
-                    authContext
-                ).makeRequest();
-                const allScripturesPromise = new AllScripturesRequest(
-                    authContext
-                ).makeRequest();
+            if (authContext.timeRemaining() <= 0) return;
 
-                // Await all responses in parallel
-                const [lessonsResponse, answersData, scripturesData] =
-                    await Promise.all([
-                        allLessonsPromise,
-                        answersPromise,
-                        allScripturesPromise,
-                    ]);
+            new AnswersRequest(authContext)
+                .makeRequest()
+                .then((a) => !cancelled && setAnswersData(a))
+                .catch((err) => console.error("Failed to load answers:", err));
 
-                postProcessLessonResponse(lessonsResponse);
+            // Render from the cached index right away (if any), and refresh
+            // it in the background; studies whose version changed get reloaded.
+            const freshIndexPromise = loadLessonIndex(authContext);
+            const cachedIndex = await cacheGet<LessonIndexStudy[]>("lesson-index");
+            const index = cachedIndex ?? (await freshIndexPromise);
+            if (cancelled) return;
 
-                setLessonData(lessonsResponse);
-                setAnswersData(answersData);
-                setScripturesData(scripturesData);
+            setLessonData({
+                isSuccess: true,
+                errorMsg: null,
+                errorCode: null,
+                version: 0,
+                data: { studies: index.map(studyFromIndex), signature: "" },
+            });
 
-                if (savedStudyId) setCurrentStudyId(Number(savedStudyId));
-                if (savedLessonId) setCurrentLessonId(Number(savedLessonId));
-                if (savedLessonDayId)
-                    setCurrentLessonDayId(Number(savedLessonDayId));
+            // Load the saved (or active) study first, then the rest in the
+            // background, newest first.
+            const firstId =
+                index.find((s) => s.studyId === savedStudyId)?.studyId ??
+                index.find((s) => s.isActive)?.studyId ??
+                index[index.length - 1]?.studyId;
+            const ordered = [
+                ...index.filter((s) => s.studyId === firstId),
+                ...[...index].reverse().filter((s) => s.studyId !== firstId),
+            ];
+
+            const loadStudy = async (s: LessonIndexStudy) => {
+                try {
+                    const study = await loadStudyContent(
+                        authContext,
+                        s.studyId,
+                        s.version
+                    );
+                    if (!cancelled) mergeStudy(study);
+                } catch (err) {
+                    console.error(`Failed to load study ${s.studyId}:`, err);
+                }
+            };
+
+            for (let i = 0; i < ordered.length; i++) {
+                await loadStudy(ordered[i]);
+                if (cancelled) return;
+                if (i === 0) {
+                    setDefaultStudyId(firstId);
+                    if (savedStudyId) setCurrentStudyId(Number(savedStudyId));
+                    if (savedLessonId) setCurrentLessonId(Number(savedLessonId));
+                    if (savedLessonDayId)
+                        setCurrentLessonDayId(Number(savedLessonDayId));
+                }
+            }
+
+            const freshIndex = await freshIndexPromise;
+            cacheSet("lesson-index", freshIndex);
+            if (cancelled || !cachedIndex) return;
+            const cachedVersions = new Map(
+                cachedIndex.map((s) => [s.studyId, s.version])
+            );
+            const newStudies = freshIndex.filter(
+                (s) => !cachedVersions.has(s.studyId)
+            );
+            if (newStudies.length > 0) {
+                // A new study appeared: add placeholders, then load it.
+                setLessonData((prev) =>
+                    prev && {
+                        ...prev,
+                        data: {
+                            ...prev.data,
+                            studies: freshIndex.map(
+                                (s) =>
+                                    prev.data.studies.find(
+                                        (p) => p.studyId === s.studyId
+                                    ) ?? studyFromIndex(s)
+                            ),
+                        },
+                    }
+                );
+            }
+            for (const s of freshIndex) {
+                if (cachedVersions.get(s.studyId) !== s.version) await loadStudy(s);
             }
         }
 
         fetchData();
+        return () => {
+            cancelled = true;
+        };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    // The study whose scriptures we need: the one containing the selected day,
+    // else the selected study, else the default study.
+    const viewedStudyId =
+        (currentLessonDayId &&
+            lessonData?.data.studies.find((study) =>
+                study.lessons.some((l) =>
+                    l.lessonDays.some((d) => d.lessonDayId === currentLessonDayId)
+                )
+            )?.studyId) ||
+        currentStudyId ||
+        defaultStudyId;
+
+    useEffect(() => {
+        if (!viewedStudyId || loadedScriptureStudies.current.has(viewedStudyId))
+            return;
+        loadedScriptureStudies.current.add(viewedStudyId);
+        const authContext = AuthContextHolder.getAuthContext();
+        loadStudyScriptures(authContext, viewedStudyId)
+            .then((scriptures) =>
+                setScripturesData((prev) => ({
+                    isSuccess: true,
+                    errorMsg: null,
+                    errorCode: null,
+                    version: 0,
+                    data: [...(prev?.data ?? []), ...scriptures],
+                }))
+            )
+            .catch((err) => {
+                loadedScriptureStudies.current.delete(viewedStudyId);
+                console.error("Failed to load scriptures:", err);
+            });
+    }, [viewedStudyId]);
 
     return (
         <div

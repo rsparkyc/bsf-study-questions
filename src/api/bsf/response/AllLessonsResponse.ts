@@ -19,7 +19,8 @@ interface LessonDayQuestionTranslation {
 interface LessonDayQuestionScripture {
     scriptureId: number;
     displayOrder: number;
-    scripture: {
+    // null in the v2 lesson-content payload; the scripture record carries chapterVerses
+    scripture: null | {
         ScriptureId: number;
         bookAbbreviation: string;
         chapter: number;

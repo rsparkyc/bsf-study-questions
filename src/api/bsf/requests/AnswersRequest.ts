@@ -1,8 +1,8 @@
 import AnswersResponse from '../response/AnswersResponse'
 import AuthContext from '../AuthContext';
-import { BsfProxiedRequest } from './auth/BsfProxiedRequest';
+import { BsfRequest } from './BsfRequest';
 
-export class AnswersRequest extends BsfProxiedRequest<AnswersResponse> {
+export class AnswersRequest extends BsfRequest<AnswersResponse> {
   constructor(protected authContext: AuthContext) {
     super(authContext);
   }
