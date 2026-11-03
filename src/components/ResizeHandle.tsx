@@ -11,21 +11,6 @@ const ResizeHandle: React.FC<ResizeHandleProps> = ({ onResize }) => {
     const startX = useRef(0);
     const startWidth = useRef(0);
 
-    const handleMouseDown = useCallback((e: React.MouseEvent) => {
-        isDragging.current = true;
-        startX.current = e.clientX;
-        startWidth.current =
-            (e.target as HTMLElement).parentElement?.offsetWidth || 350;
-
-        document.addEventListener("mousemove", handleMouseMove);
-        document.addEventListener("mouseup", handleMouseUp);
-        document.body.style.cursor = "col-resize";
-        document.body.style.userSelect = "none";
-
-        e.preventDefault();
-        e.stopPropagation();
-    }, []);
-
     const handleMouseMove = useCallback(
         (e: MouseEvent) => {
             if (!isDragging.current) return;
@@ -53,6 +38,21 @@ const ResizeHandle: React.FC<ResizeHandleProps> = ({ onResize }) => {
         document.body.style.cursor = "";
         document.body.style.userSelect = "";
     }, [handleMouseMove]);
+
+    const handleMouseDown = useCallback((e: React.MouseEvent) => {
+        isDragging.current = true;
+        startX.current = e.clientX;
+        startWidth.current =
+            (e.target as HTMLElement).parentElement?.offsetWidth || 350;
+
+        document.addEventListener("mousemove", handleMouseMove);
+        document.addEventListener("mouseup", handleMouseUp);
+        document.body.style.cursor = "col-resize";
+        document.body.style.userSelect = "none";
+
+        e.preventDefault();
+        e.stopPropagation();
+    }, [handleMouseMove, handleMouseUp]);
 
     return (
         <div className="resize-handle" onMouseDown={handleMouseDown}>

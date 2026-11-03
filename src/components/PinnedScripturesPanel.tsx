@@ -10,7 +10,7 @@ import ResizeHandle from "./ResizeHandle";
 import Scripture from "./ScriptureComponent";
 
 const PinnedScripturesPanel: React.FC = () => {
-    const { pinnedScriptures, unpinScripture, panelWidth, setPanelWidth } =
+    const { pinnedScriptures, panelWidth, setPanelWidth } =
         usePinnedScriptures();
 
     if (pinnedScriptures.length === 0) {
