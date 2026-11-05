@@ -77,7 +77,6 @@
 
 .scriptures li:hover {
     background: rgba(241, 204, 192, 0.3);
-    transform: translateX(4px);
 }
 
 .scriptures li:last-child {
@@ -102,7 +101,6 @@
 }
 
 .question:hover {
-    transform: translateY(-2px);
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
 }
 

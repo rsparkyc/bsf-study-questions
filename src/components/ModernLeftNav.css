@@ -135,7 +135,6 @@
 
 .study-toggle-btn:hover {
     background: rgba(255, 255, 255, 0.5);
-    transform: scale(1.05);
 }
 
 /* Section Titles */
@@ -173,7 +172,6 @@
 
 .lesson-card:hover {
     background: rgba(255, 255, 255, 0.4);
-    transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(139, 111, 71, 0.2);
 }
 
@@ -394,7 +392,6 @@
 
 .other-study-btn:hover {
     background: rgba(255, 255, 255, 0.3);
-    transform: translateX(2px);
 }
 
 .study-name {
