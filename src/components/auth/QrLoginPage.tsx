@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 
 import { AccessToken, AuthContextHolder } from "../../api/bsf/AuthContext";
@@ -14,15 +14,16 @@ const field: React.CSSProperties = { display: "block", width: "100%", boxSizing:
 
 const SESSION_MS = 170_000;
 
-// Shown on the big screen: displays the code and waits for the phone.
-const QrScreen: React.FC = () => {
+// Displays the code, replacing it when it expires, until the phone delivers a token.
+export const QrCode: React.FC<{ onToken: (token: AccessToken) => void }> = ({ onToken }) => {
     const [session, setSession] = useState<QrSession>();
-    const [name, setName] = useState<string>();
     const [error, setError] = useState<string>();
 
-    useEffect(() => {
+    const startSession = useCallback(() => {
         createSession().then(setSession).catch((e) => setError(e.message));
     }, []);
+
+    useEffect(startSession, [startSession]);
 
     useEffect(() => {
         if (!session) return;
@@ -30,15 +31,14 @@ const QrScreen: React.FC = () => {
         const timer = setInterval(async () => {
             if (Date.now() - started > SESSION_MS) {
                 clearInterval(timer);
-                setSession(undefined);
-                setError("Code expired. Reload for a new one.");
+                startSession();
                 return;
             }
             try {
                 const token = await pollToken(session);
                 if (token) {
                     clearInterval(timer);
-                    setName(whoIs(token)); // proof of concept: token is not kept
+                    onToken(token);
                 }
             } catch (e: any) {
                 clearInterval(timer);
@@ -46,16 +46,23 @@ const QrScreen: React.FC = () => {
             }
         }, 2000);
         return () => clearInterval(timer);
-    }, [session]);
+    }, [session, onToken, startSession]);
 
-    if (name) return <div style={box}><h2>Signed in as {name}</h2><p>QR login worked. Nothing was saved on this device.</p></div>;
     return (
-        <div style={box}>
-            <h2>Scan to log in</h2>
+        <>
             {session && <QRCodeSVG value={session.url} size={260} includeMargin />}
             {error && <p>{error}</p>}
-        </div>
+        </>
     );
+};
+
+// Standalone test page at /qr: shows who logged in without keeping the token.
+const QrScreen: React.FC = () => {
+    const [name, setName] = useState<string>();
+    const onToken = useCallback((token: AccessToken) => setName(whoIs(token)), []);
+
+    if (name) return <div style={box}><h2>Signed in as {name}</h2><p>QR login worked. Nothing was saved on this device.</p></div>;
+    return <div style={box}><h2>Scan to log in</h2><QrCode onToken={onToken} /></div>;
 };
 
 // Opened on the phone from the QR code.

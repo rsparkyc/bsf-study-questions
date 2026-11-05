@@ -6,6 +6,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { AuthorizeRequest } from "../../api/bsf/requests/auth/AuthorizeRequest";
 import { ConfigurationRequest } from "../../api/bsf/requests/auth/ConfigurationRequest";
 import { ConfirmedRequest } from "../../api/bsf/requests/auth/ConfirmedRequest";
+import { QrCode } from "./QrLoginPage";
 import { PersonRequest } from "../../api/bsf/requests/PersonRequest";
 import { RefreshTokenRequest } from "../../api/bsf/requests/auth/RefreshTokenRequest";
 import { SelfAssertedRequest } from "../../api/bsf/requests/auth/SelfAssertedRequest";
@@ -34,6 +35,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginStateChange }) => {
     >();
 
     const [isLoggingIn, setIsLoggingIn] = useState(false);
+    const [isQrOpen, setIsQrOpen] = useState(false);
     const [error, setError] = useState<null | string>(null);
 
     // Check if already logged in
@@ -149,6 +151,22 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginStateChange }) => {
             }
         },
         [onLoginStateChange]
+    );
+
+    const handleQrToken = useCallback(
+        async (token: AccessToken) => {
+            const authContext = AuthContextHolder.buildFromToken(token);
+            try {
+                await new PersonRequest(authContext).makeRequest();
+                setLoggedIn(token);
+            } catch (err: any) {
+                console.error("Failed to finish QR login:", err);
+                setError("QR login failed. Please try again.");
+            } finally {
+                setIsQrOpen(false);
+            }
+        },
+        [setLoggedIn]
     );
 
     useEffect(() => {
@@ -293,6 +311,13 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginStateChange }) => {
                                 : "Please Read Disclaimer"}
                         </button>
                         <button
+                            disabled={!disclaimerAccepted}
+                            className="login-button"
+                            onClick={() => setIsQrOpen(true)}
+                        >
+                            Login with QR Code
+                        </button>
+                        <button
                             className="disclaimer-button"
                             onClick={() =>
                                 setIsDisclaimerOpen(!isDisclaimerOpen)
@@ -303,6 +328,27 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginStateChange }) => {
                     </div>
                 )}
             </div>
+
+            {isQrOpen && (
+                <div
+                    className="qr-modal-backdrop"
+                    onClick={() => setIsQrOpen(false)}
+                >
+                    <div
+                        className="qr-modal"
+                        role="dialog"
+                        aria-label="Login with QR code"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <h2>Scan to log in</h2>
+                        <p>Scan this with your phone's camera.</p>
+                        <QrCode onToken={handleQrToken} />
+                        <button onClick={() => setIsQrOpen(false)}>
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            )}
 
             {error && <div className="error-message">{error}</div>}
 

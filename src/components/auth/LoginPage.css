@@ -174,3 +174,28 @@ button {
         max-width: 90%;
     }
 }
+
+.qr-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.qr-modal {
+    padding: 24px;
+    max-width: calc(100vw - 32px);
+    box-sizing: border-box;
+    text-align: center;
+    color: #222;
+    background: #fff;
+    border-radius: 8px;
+}
+
+.qr-modal button {
+    display: block;
+    margin: 12px auto 0;
+}
