@@ -1,6 +1,12 @@
 import "./TypeaheadTextarea.css";
 
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, {
+    useCallback,
+    useEffect,
+    useLayoutEffect,
+    useMemo,
+    useState,
+} from "react";
 
 import StringUtils from "../utils/StringUtils";
 import debounce from "lodash.debounce";
@@ -38,6 +44,7 @@ export const TypeaheadTextarea: React.FC<Props> = ({
 
     const mainTextareaRef = React.useRef<HTMLTextAreaElement>(null);
     const ghostTextareaRef = React.useRef<HTMLTextAreaElement>(null);
+    const pendingCursor = React.useRef<number | null>(null);
 
     // Sync inputValue with defaultValue when it changes (e.g., when switching between days)
     useEffect(() => {
@@ -137,6 +144,37 @@ export const TypeaheadTextarea: React.FC<Props> = ({
         }
     };
 
+    // Insert pasted text ourselves. Chrome sometimes fires paste and beforeinput
+    // and then inserts nothing, which dropped dictated text from Wispr Flow.
+    const handlePaste = (event: React.ClipboardEvent<HTMLTextAreaElement>) => {
+        const pasted = event.clipboardData.getData("text/plain");
+        if (!pasted) return;
+        event.preventDefault();
+
+        const textarea = event.currentTarget;
+        const { selectionStart, selectionEnd, value } = textarea;
+        const val =
+            value.slice(0, selectionStart) + pasted + value.slice(selectionEnd);
+        pendingCursor.current = selectionStart + pasted.length;
+
+        setInputValue(val);
+        setGhostValue("");
+        fetchSuggestions(val);
+        if (onChange) {
+            onChange(val);
+        }
+    };
+
+    useLayoutEffect(() => {
+        if (pendingCursor.current !== null && mainTextareaRef.current) {
+            mainTextareaRef.current.setSelectionRange(
+                pendingCursor.current,
+                pendingCursor.current
+            );
+            pendingCursor.current = null;
+        }
+    }, [inputValue]);
+
     const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (event.code === "Tab" && ghostValue) {
             event.preventDefault();
@@ -166,6 +204,7 @@ export const TypeaheadTextarea: React.FC<Props> = ({
                 value={inputValue}
                 onChange={handleInputChange}
                 onKeyDown={handleKeyDown}
+                onPaste={handlePaste}
                 onBlur={() => setGhostValue("")}
                 className={
                     "typeahead-input" +
