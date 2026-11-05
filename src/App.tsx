@@ -5,12 +5,17 @@ import SettingsContext, { Settings, defaultSettings } from './context/SettingsCo
 import { AuthContextHolder } from './api/bsf/AuthContext';
 import LessonContainer from './components/LessonContainerComponent';
 import LoginPage from './components/auth/LoginPage';
+import QrLoginPage from './components/auth/QrLoginPage';
 import { useState } from 'react';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(AuthContextHolder.hasAuthContext());
   const [settings, setSettings] = useState<Settings>(defaultSettings);
 
+
+  if (new URLSearchParams(window.location.search).has('qrlogin')) {
+    return <QrLoginPage />;
+  }
 
   const handleLoginStateChange = (loggedIn: boolean) => {
     setIsLoggedIn(loggedIn);
