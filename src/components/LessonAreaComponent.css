@@ -344,3 +344,13 @@
     color: #4a9d5f;
     font-weight: bold;
 }
+
+/* Full-width audio player for finer scrubbing control */
+.notes-audio-area {
+    width: 100%;
+}
+
+.notes-audio-area audio {
+    display: block;
+    width: 100%;
+}
